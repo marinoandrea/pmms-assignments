@@ -30,16 +30,20 @@ void do_compute(const struct parameters *p, struct results *r)
         {
             for (size_t col = 0; col < n_cols; ++col)
             {
-                double coef = m_coef[row * n_cols + col];
+                double coef = m_coef[(row - 1) * n_cols + col];
 
-                neighbors[0] = m_heat[(row - 1) * n_cols + col];
-                neighbors[1] = m_heat[(row - 1) * n_cols + col + 1];
-                neighbors[2] = m_heat[row * n_cols + col + 1];
-                neighbors[3] = m_heat[(row + 1) * n_cols + col + 1];
+                // accounting for the cilinder wrapping around
+                size_t prev_col = (col - 1) % n_cols;
+                size_t next_col = (col + 1) % n_cols;
+
+                neighbors[0] = m_heat[(row - 1) * n_cols + (col)];
+                neighbors[1] = m_heat[(row - 1) * n_cols + next_col];
+                neighbors[2] = m_heat[row * n_cols + next_col];
+                neighbors[3] = m_heat[(row + 1) * n_cols + next_col];
                 neighbors[4] = m_heat[(row + 1) * n_cols + col];
-                neighbors[5] = m_heat[(row + 1) * n_cols + col - 1];
-                neighbors[6] = m_heat[row * n_cols + col - 1];
-                neighbors[7] = m_heat[(row - 1) * n_cols + col - 1];
+                neighbors[5] = m_heat[(row + 1) * n_cols + prev_col];
+                neighbors[6] = m_heat[row * n_cols + prev_col];
+                neighbors[7] = m_heat[(row - 1) * n_cols + prev_col];
             }
         }
     }
