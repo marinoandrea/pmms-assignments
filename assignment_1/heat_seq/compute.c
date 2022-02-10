@@ -32,27 +32,28 @@ void do_compute(const struct parameters *p, struct results *r)
     {
         for (size_t row = 1; row < n_rows + 1; ++row)
         {
-            size_t prev_row = row - 1;
-            size_t next_row = row + 1;
+            size_t idx_row      = row * n_cols;
+            size_t idx_prev_row = idx_row - n_cols;
+            size_t idx_next_row = idx_row + n_cols;
 
             for (size_t col = 0; col < n_cols; ++col)
             {
                 // the coef. matrix does not contain halo values
                 // so we take the value for row - 1
-                double coef = m_coef[prev_row * n_cols + col];
+                double coef = m_coef[idx_prev_row + col];
 
                 // accounting for the cilinder wrapping around
                 size_t prev_col = (col - 1) % n_cols;
                 size_t next_col = (col + 1) % n_cols;
 
-                neighbors[0] = m_heat[prev_row * n_cols + col];
-                neighbors[1] = m_heat[prev_row * n_cols + next_col];
-                neighbors[2] = m_heat[row      * n_cols + next_col];
-                neighbors[3] = m_heat[next_row * n_cols + next_col];
-                neighbors[4] = m_heat[next_row * n_cols + col];
-                neighbors[5] = m_heat[next_row * n_cols + prev_col];
-                neighbors[6] = m_heat[row      * n_cols + prev_col];
-                neighbors[7] = m_heat[prev_row * n_cols + prev_col];
+                neighbors[0] = m_heat[idx_prev_row + col];
+                neighbors[1] = m_heat[idx_prev_row + next_col];
+                neighbors[2] = m_heat[idx_row      + next_col];
+                neighbors[3] = m_heat[idx_next_row + next_col];
+                neighbors[4] = m_heat[idx_next_row + col];
+                neighbors[5] = m_heat[idx_next_row + prev_col];
+                neighbors[6] = m_heat[idx_row      + prev_col];
+                neighbors[7] = m_heat[idx_prev_row + prev_col];
 
                 // diagonal (d) and direct (s) coefficients
                 double coef_r = 1 - coef;
