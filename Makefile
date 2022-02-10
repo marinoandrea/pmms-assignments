@@ -1,7 +1,7 @@
 #MODIFY the following variables (STUDENTIDS, GROUP) with your infos
 #STUDENTIDS should be a list of the student ids of all group members,
 #			e.g, STUDENTIDS=1111111 2222222 3333333 4444444
-STUDENTIDS=14100320 HERE_ID_STUDENT HERE_ID_STUDENT HERE_ID_STUDENT
+STUDENTIDS=14100320 HERE_ID_STUDENT 13295357 HERE_ID_STUDENT
 GROUP=20
 
 ASSIGNMENTS=$(filter assignment_%,$(wildcard *))
