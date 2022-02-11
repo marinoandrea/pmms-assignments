@@ -20,9 +20,9 @@ void do_compute(const struct parameters *p, struct results *r)
     // the heat matrix has 2 additional rows for the halo values
     // NOTE: we create 2 heat matrices in order to have a front and back buffer
     // for computation that we swap at every iteration
-    double *m_heat_a = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
-    double *m_heat_b = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
-    double *m_coef   = (double *)malloc(sizeof(double) * (n_cells));
+    double *m_heat_a = (double *)alloca(sizeof(double) * (n_cells + 2 * n_cols));
+    double *m_heat_b = (double *)alloca(sizeof(double) * (n_cells + 2 * n_cols));
+    double *m_coef   = (double *)alloca(sizeof(double) * (n_cells));
 
     // we copy the first and last row of the heat matrix twice for the halo values
     memcpy(m_heat_a,                    p->tinit,                      sizeof(double) * n_cols);
