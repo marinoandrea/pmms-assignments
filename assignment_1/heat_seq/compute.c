@@ -130,8 +130,4 @@ void do_compute(const struct parameters *p, struct results *r)
         end_picture();
 #endif
     }
-
-    free(m_coef);
-    free(m_heat_b);
-    free(m_heat_a);
 }
