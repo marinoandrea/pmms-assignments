@@ -7,6 +7,23 @@
 
 ## Useful commands
 
+### SSH config
+
+Add the following to your SSH config file (usually `~/.ssh/config`) to work on the DAS-5 from home:
+
+```
+Host vu
+    Hostname 130.37.164.129
+    User <your VUnetID>
+
+Host das5
+    Hostname fs0.das5.cs.vu.nl
+    User <your DAS-5 username>
+    ProxyCommand ssh -q vu nc %h 22
+```
+
+You'll still have to enter both of your passwords every time you log in (first your VU password, then your DAS-5 account password).
+
 ### Local
 
 A list of all installed compiler intrinsics for GCC, everything that is not present has `-mno-` in front. This may also work on DAS-5 but make sure you run it on a compute node, not on the head node.
