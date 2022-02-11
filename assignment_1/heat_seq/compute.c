@@ -2,7 +2,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include "compute.h"
 
 #define DEBUG
@@ -15,15 +14,6 @@ void do_compute(const struct parameters *p, struct results *r)
     size_t n_iters  = p->maxiter;
     size_t n_report = p->period;
 
-    r->niter    = 0;
-    r->tmax     = 0;
-    r->tmin     = 0;
-    r->tavg     = 0;
-    r->maxdiff  = 0;
-    r->time     = 0;
-
-    double heat_sum = 0;
-
     // allocating stack space for the matrices
     // the heat matrix has 2 additional rows for the halo values
     double *m_heat = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
@@ -31,8 +21,8 @@ void do_compute(const struct parameters *p, struct results *r)
 
     // we copy the first and last row of the heat matrix twice for the halo values
     memcpy(m_heat,                     p->tinit,                      sizeof(double) * n_cols);
-    memcpy(m_heat + n_cols,            p->tinit,                      sizeof(double) * n_cells);    
-    memcpy(m_heat + n_cells + n_cols,  p->tinit + n_cells - n_cols,   sizeof(double) * n_cols);    
+    memcpy(m_heat + n_cols,            p->tinit,                      sizeof(double) * n_cells);
+    memcpy(m_heat + n_cells + n_cols,  p->tinit + n_cells - n_cols,   sizeof(double) * n_cols);
     memcpy(m_coef,                     p->conductivity,               sizeof(double) * n_cells);
 
     double neighbors[8]; // clockwise, starting at the top
@@ -41,8 +31,16 @@ void do_compute(const struct parameters *p, struct results *r)
     double w_coef_d = sqrt(2) / (sqrt(2) + 1);
     double w_coef_s = 1       / (sqrt(2) + 1);
 
-    for (size_t i = 1; i < n_iters + 1; ++i)
+    // iteration number
+    size_t i = 1;
+
+    // we initialize this to be higher than the threshold
+    r->maxdiff  = p->threshold + 1;
+
+    while (i < n_iters + 1 && r->maxdiff > p->threshold)
     {
+        double heat_sum = 0;
+
         if (i % n_report == 0 || i == n_iters) 
         {
             r->tmax     = 0;
@@ -105,7 +103,6 @@ void do_compute(const struct parameters *p, struct results *r)
                     r->tmin     = r->tmin > next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
                     r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff; // fmax(r->maxdiff, abs(prev_heat - next_heat));
                     heat_sum    += next_heat;
-
                 }
 
 #ifdef DEBUG
@@ -120,6 +117,8 @@ void do_compute(const struct parameters *p, struct results *r)
             r->tavg  = heat_sum / n_cells;
             report_results(p, r);
         } 
+
+        ++i;
 
 #ifdef DEBUG
         end_picture();
