@@ -16,8 +16,8 @@ void do_compute(const struct parameters *p, struct results *r)
 
     // allocating stack space for the matrices
     // the heat matrix has 2 additional rows for the halo values
-    double *m_heat = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
-    double *m_coef = (double *)malloc(sizeof(double) * (n_cells));
+    double *m_heat = (double *)alloca(sizeof(double) * (n_cells + 2 * n_cols));
+    double *m_coef = (double *)alloca(sizeof(double) * (n_cells));
 
     // we copy the first and last row of the heat matrix twice for the halo values
     memcpy(m_heat,                     p->tinit,                      sizeof(double) * n_cols);
@@ -124,7 +124,4 @@ void do_compute(const struct parameters *p, struct results *r)
         end_picture();
 #endif
     }
-
-    free(m_coef);
-    free(m_heat);
 }
