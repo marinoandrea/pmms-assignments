@@ -1,5 +1,12 @@
-.idea/*
-*.o
+# Editor configs
+.idea
+.vs
 .vscode
+
+# Output files
+*.o
+
+# Jupyter checkpoints
+*-checkpoint.ipynb
 
 assignment_3/histo/with_mutual_ex/histo_atomic/histo_atomic
