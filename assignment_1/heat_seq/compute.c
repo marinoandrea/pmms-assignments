@@ -1,10 +1,12 @@
 #include <time.h>
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include "compute.h"
 
 #define DEBUG
+
+#define COEF_D 0.103553391
+#define COEF_S 0.146446609
 
 void do_compute(const struct parameters *p, struct results *r)
 {
@@ -16,30 +18,38 @@ void do_compute(const struct parameters *p, struct results *r)
 
     // allocating stack space for the matrices
     // the heat matrix has 2 additional rows for the halo values
-    double *m_heat = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
-    double *m_coef = (double *)malloc(sizeof(double) * (n_cells));
+    // NOTE: we create 2 heat matrices in order to have a front and back buffer
+    // for computation that we swap at every iteration
+    double *m_heat_a = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
+    double *m_heat_b = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
+    double *m_coef   = (double *)malloc(sizeof(double) * (n_cells));
 
     // we copy the first and last row of the heat matrix twice for the halo values
-    memcpy(m_heat,                     p->tinit,                      sizeof(double) * n_cols);
-    memcpy(m_heat + n_cols,            p->tinit,                      sizeof(double) * n_cells);
-    memcpy(m_heat + n_cells + n_cols,  p->tinit + n_cells - n_cols,   sizeof(double) * n_cols);
-    memcpy(m_coef,                     p->conductivity,               sizeof(double) * n_cells);
-
-    double neighbors[8]; // clockwise, starting at the top
-
-    // constants
-    double w_coef_d = sqrt(2) / (sqrt(2) + 1);
-    double w_coef_s = 1       / (sqrt(2) + 1);
+    memcpy(m_heat_a,                    p->tinit,                      sizeof(double) * n_cols);
+    memcpy(m_heat_a + n_cols,           p->tinit,                      sizeof(double) * n_cells);
+    memcpy(m_heat_a + n_cells + n_cols, p->tinit + n_cells - n_cols,   sizeof(double) * n_cols);
+    memcpy(m_heat_b,                    m_heat_a,                      sizeof(double) * (n_cells + 2 * n_cols));
+    memcpy(m_coef,                      p->conductivity,               sizeof(double) * n_cells);
 
     // iteration number
     size_t i = 1;
 
     // we initialize this to be higher than the threshold
     r->maxdiff  = p->threshold + 1;
+    r->tmax     = p->io_tmax;
+    r->tmin     = p->io_tmin;
 
-    while (i < n_iters + 1 && r->maxdiff > p->threshold)
+    while (i < n_iters + 1 && r->maxdiff >= p->threshold)
     {
         double heat_sum = 0;
+
+        // swapping front and back buffer at every iteration
+        double *m_heat_prev = i % 2 == 0 ? m_heat_a : m_heat_b;
+        double *m_heat_next = i % 2 == 0 ? m_heat_b : m_heat_a;
+
+#ifdef DEBUG
+        begin_picture(i, n_cols, n_rows, r->tmin, r->tmax);
+#endif
 
         if (i % n_report == 0 || i == n_iters) 
         {
@@ -49,10 +59,6 @@ void do_compute(const struct parameters *p, struct results *r)
             r->maxdiff  = 0;
             r->time     = 0;
         } 
-
-#ifdef DEBUG
-        begin_picture(i, n_cols, n_rows, p->io_tmin, p->io_tmax);
-#endif
 
         for (size_t row = 1; row < n_rows + 1; ++row)
         {
@@ -70,28 +76,28 @@ void do_compute(const struct parameters *p, struct results *r)
                 size_t prev_col = (col - 1) % n_cols;
                 size_t next_col = (col + 1) % n_cols;
 
-                neighbors[0] = m_heat[idx_prev_row + col];
-                neighbors[1] = m_heat[idx_prev_row + next_col];
-                neighbors[2] = m_heat[idx_row      + next_col];
-                neighbors[3] = m_heat[idx_next_row + next_col];
-                neighbors[4] = m_heat[idx_next_row + col];
-                neighbors[5] = m_heat[idx_next_row + prev_col];
-                neighbors[6] = m_heat[idx_row      + prev_col];
-                neighbors[7] = m_heat[idx_prev_row + prev_col];
+                double neighbors[8]; 
 
-                // diagonal (d) and direct (s) coefficients
-                double coef_r = 1 - coef;
-                double coef_d = coef_r * w_coef_d;
-                double coef_s = coef_r * w_coef_s;
+                // clockwise, starting at the top
+                neighbors[0] = m_heat_prev[idx_prev_row + col];
+                neighbors[1] = m_heat_prev[idx_prev_row + next_col];
+                neighbors[2] = m_heat_prev[idx_row      + next_col];
+                neighbors[3] = m_heat_prev[idx_next_row + next_col];
+                neighbors[4] = m_heat_prev[idx_next_row + col];
+                neighbors[5] = m_heat_prev[idx_next_row + prev_col];
+                neighbors[6] = m_heat_prev[idx_row      + prev_col];
+                neighbors[7] = m_heat_prev[idx_prev_row + prev_col];
 
                 // partial diagonal (d) and direct (s) sums
                 double sum_d = neighbors[1] + neighbors[3] + neighbors[5] + neighbors[7];
                 double sum_s = neighbors[0] + neighbors[2] + neighbors[4] + neighbors[6];
 
-                double prev_heat        = m_heat[row * n_cols + col];
-                double next_heat        = coef * prev_heat + sum_d * coef_d + sum_s * coef_s;
-                double heat_abs_diff    = abs(prev_heat - next_heat);
-                m_heat[row * n_cols + col] = next_heat;
+                double prev_heat = m_heat_prev[idx_row + col];
+                double next_heat = coef * (sum_d * COEF_D + sum_s * COEF_S) + (1 - coef) * prev_heat;
+
+                double heat_abs_diff = fabs(prev_heat - next_heat);
+                
+                m_heat_next[idx_row + col] = next_heat;
                 
                 // NOTE: this is gonna slow us down considerably due to branching
                 // and calling functions (fmax, fmin) inside the loop. However, we
@@ -106,7 +112,7 @@ void do_compute(const struct parameters *p, struct results *r)
                 }
 
 #ifdef DEBUG
-                draw_point(col, row - 1, next_heat);
+                draw_point(col, row - 1, prev_heat);
 #endif
             }
         }
@@ -126,5 +132,6 @@ void do_compute(const struct parameters *p, struct results *r)
     }
 
     free(m_coef);
-    free(m_heat);
+    free(m_heat_b);
+    free(m_heat_a);
 }
