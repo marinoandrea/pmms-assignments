@@ -57,11 +57,12 @@ alias intrinsics="gcc -v -xc /dev/null -O3 -march=native -o- -E 2>&1 | grep -o -
 ```
 ### DAS-5
 
-Always load `prun` and CUDA when you log in:
+Always load `prun`, CUDA, and ICC when you log in:
 
 ```bash
 module load prun
 module load cuda80/toolkit
+module load intel/compiler/64/15.0/2015.5.223
 ```
 
 Just some shorthand commands:
