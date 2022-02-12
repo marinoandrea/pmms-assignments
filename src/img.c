@@ -33,7 +33,7 @@ void end_picture(void)
 
     /* create file name */
     snprintf(fname, sizeof(fname), "img.%.10zu.pgm", gkey);
-    printf("Creating image file: %s... ", fname);
+    // printf("Creating image file: %s... ", fname);
 
     /* open file */
     if (!(f = fopen(fname, "w"))) die("fopen");
@@ -55,6 +55,6 @@ void end_picture(void)
 
     /* close and finish */
     fclose(f);
-    printf("done.\n");
+    // printf("done.\n");
     free(gdata);
 }
