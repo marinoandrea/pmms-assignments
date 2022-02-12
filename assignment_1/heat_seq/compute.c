@@ -12,9 +12,6 @@
 
 void do_compute(const struct parameters *p, struct results *r)
 {
-    struct timespec before, after;
-    clock_gettime(CLOCK_MONOTONIC, &before);
-
     size_t n_cols       = p->M;
     size_t n_rows       = p->N;
     size_t n_cells      = n_rows * n_cols;
@@ -45,6 +42,10 @@ void do_compute(const struct parameters *p, struct results *r)
     r->tmax     = p->io_tmax;
     r->tmin     = p->io_tmin;
 
+    // NOTE: we do not include setup operations in time calculations
+    struct timespec before, after;
+    clock_gettime(CLOCK_MONOTONIC, &before);
+
     while (i < n_iters + 1 && r->maxdiff >= p->threshold)
     {
         double heat_sum = 0;
@@ -54,7 +55,7 @@ void do_compute(const struct parameters *p, struct results *r)
         double *m_heat_next = i % 2 == 0 ? m_heat_b : m_heat_a;
 
 #ifdef DEBUG
-        begin_picture(i, n_cols, n_rows, r->tmin, r->tmax);
+        begin_picture(i, n_cols, n_rows, p->io_tmin, p->io_tmax);
 #endif
 
         if (i % n_report == 0 || i == n_iters) 
