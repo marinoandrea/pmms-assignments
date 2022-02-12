@@ -1,4 +1,5 @@
 #include <time.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include "compute.h"
@@ -120,7 +121,7 @@ void do_compute(const struct parameters *p, struct results *r)
             }
         }
 
-        if (i % n_report == 0) 
+        if (i % n_report == 0 || i == n_iters) 
         {
             clock_gettime(CLOCK_MONOTONIC, &after);
             r->time = (double)(after.tv_sec - before.tv_sec) +
