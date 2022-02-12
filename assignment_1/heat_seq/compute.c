@@ -39,8 +39,6 @@ void do_compute(const struct parameters *p, struct results *r)
 
     // we initialize this to be higher than the threshold
     r->maxdiff  = p->threshold + 1;
-    r->tmax     = p->io_tmax;
-    r->tmin     = p->io_tmin;
 
     // NOTE: we do not include setup operations in time calculations
     struct timespec before, after;
@@ -50,6 +48,12 @@ void do_compute(const struct parameters *p, struct results *r)
     {
         double heat_sum = 0;
 
+        r->niter    = i;
+        r->tmax     = 0;
+        r->tmin     = DBL_MAX;
+        r->tavg     = 0;
+        r->maxdiff  = 0;
+
         // swapping front and back buffer at every iteration
         double *m_heat_prev = i % 2 == 0 ? m_heat_a : m_heat_b;
         double *m_heat_next = i % 2 == 0 ? m_heat_b : m_heat_a;
@@ -57,14 +61,6 @@ void do_compute(const struct parameters *p, struct results *r)
 #ifdef DEBUG
         begin_picture(i, n_cols, n_rows, p->io_tmin, p->io_tmax);
 #endif
-
-        if (i % n_report == 0 || i == n_iters) 
-        {
-            r->tmax     = 0;
-            r->tmin     = DBL_MAX;
-            r->tavg     = 0;
-            r->maxdiff  = 0;
-        } 
 
         for (size_t row = 1; row < n_rows + 1; ++row)
         {
@@ -105,17 +101,11 @@ void do_compute(const struct parameters *p, struct results *r)
                 
                 m_heat_next[idx_row + col] = next_heat;
                 
-                // NOTE: this is gonna slow us down considerably due to branching
-                // and calling functions (fmax, fmin) inside the loop. However, we
-                // do it only when the report is due and at the end of the iteration
-                // so most of the times we should not be affected.
-                if (i % n_report == 0 || i == n_iters) 
-                {
-                    r->tmax     = r->tmax > next_heat ? r->tmax : next_heat; // fmax(r->tmax, next_heat);
-                    r->tmin     = r->tmin < next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
-                    r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff; // fmax(r->maxdiff, abs(prev_heat - next_heat));
-                    heat_sum    += next_heat;
-                }
+                // reporting values
+                r->tmax     = r->tmax > next_heat ? r->tmax : next_heat; // fmax(r->tmax, next_heat);
+                r->tmin     = r->tmin < next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
+                r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff; // fmax(r->maxdiff, abs(prev_heat - next_heat));
+                heat_sum    += next_heat;
 
 #ifdef DEBUG
                 draw_point(col, row - 1, prev_heat);
@@ -123,20 +113,18 @@ void do_compute(const struct parameters *p, struct results *r)
             }
         }
 
-        if (i % n_report == 0 || i == n_iters) 
+        clock_gettime(CLOCK_MONOTONIC, &after);
+        
+        r->tavg  = heat_sum / n_cells;
+        r->time  = (double)(after.tv_sec - before.tv_sec) +
+                   (double)(after.tv_nsec - before.tv_nsec) / 1e9;
+        
+        if (printreports && i % n_report == 0) 
         {
-            clock_gettime(CLOCK_MONOTONIC, &after);
-            r->time = (double)(after.tv_sec - before.tv_sec) +
-                      (double)(after.tv_nsec - before.tv_nsec) / 1e9;
-            r->niter = i;
-            r->tavg  = heat_sum / n_cells;
-            if (printreports)
-            {
-                report_results(p, r);
-            }
-        } 
+            report_results(p, r);
+        }
 
-        ++i;
+        i++;
 
 #ifdef DEBUG
         end_picture();
