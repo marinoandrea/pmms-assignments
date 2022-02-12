@@ -16,10 +16,10 @@ void do_compute(const struct parameters *p, struct results *r)
     size_t n_iters  = p->maxiter;
     size_t n_report = p->period;
 
-    // allocating stack space for the matrices
-    // the heat matrix has 2 additional rows for the halo values
+    // Allocating memory for the matrices. The heat matrix has 2 additional rows 
+    // for the halo values.
     // NOTE: we create 2 heat matrices in order to have a front and back buffer
-    // for computation that we swap at every iteration
+    // for computation that we swap at every iteration.
     double *m_heat_a = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
     double *m_heat_b = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
     double *m_coef   = (double *)malloc(sizeof(double) * (n_cells));
@@ -63,30 +63,30 @@ void do_compute(const struct parameters *p, struct results *r)
         for (size_t row = 1; row < n_rows + 1; ++row)
         {
             size_t idx_row      = row * n_cols;
-            size_t idx_prev_row = idx_row - n_cols;
-            size_t idx_next_row = idx_row + n_cols;
+            size_t idx_row_prev = idx_row - n_cols;
+            size_t idx_row_next = idx_row + n_cols;
 
             for (size_t col = 0; col < n_cols; ++col)
             {
                 // the coef. matrix does not contain halo values
                 // so we take the value for row - 1
-                double coef = m_coef[idx_prev_row + col];
+                double coef = m_coef[idx_row_prev + col];
 
                 // accounting for the cilinder wrapping around
-                size_t prev_col = (col - 1) % n_cols;
-                size_t next_col = (col + 1) % n_cols;
+                size_t col_prev = (col - 1) % n_cols;
+                size_t col_next = (col + 1) % n_cols;
 
                 double neighbors[8]; 
 
                 // clockwise, starting at the top
-                neighbors[0] = m_heat_prev[idx_prev_row + col];
-                neighbors[1] = m_heat_prev[idx_prev_row + next_col];
-                neighbors[2] = m_heat_prev[idx_row      + next_col];
-                neighbors[3] = m_heat_prev[idx_next_row + next_col];
-                neighbors[4] = m_heat_prev[idx_next_row + col];
-                neighbors[5] = m_heat_prev[idx_next_row + prev_col];
-                neighbors[6] = m_heat_prev[idx_row      + prev_col];
-                neighbors[7] = m_heat_prev[idx_prev_row + prev_col];
+                neighbors[0] = m_heat_prev[idx_row_prev + col];
+                neighbors[1] = m_heat_prev[idx_row_prev + col_next];
+                neighbors[2] = m_heat_prev[idx_row      + col_next];
+                neighbors[3] = m_heat_prev[idx_row_next + col_next];
+                neighbors[4] = m_heat_prev[idx_row_next + col];
+                neighbors[5] = m_heat_prev[idx_row_next + col_prev];
+                neighbors[6] = m_heat_prev[idx_row      + col_prev];
+                neighbors[7] = m_heat_prev[idx_row_prev + col_prev];
 
                 // partial diagonal (d) and direct (s) sums
                 double sum_d = neighbors[1] + neighbors[3] + neighbors[5] + neighbors[7];
@@ -130,6 +130,7 @@ void do_compute(const struct parameters *p, struct results *r)
         end_picture();
 #endif
     }
+
     free(m_coef);
     free(m_heat_a);
     free(m_heat_b);
