@@ -47,7 +47,7 @@ void do_compute(const struct parameters *p, struct results *r)
             r->tmin     = 0;
             r->tavg     = 0;
             r->maxdiff  = 0;
-            r->time     = 0;
+            clock_gettime(CLOCK_MONOTONIC, &before);
         } 
 
 #ifdef DEBUG
@@ -113,6 +113,9 @@ void do_compute(const struct parameters *p, struct results *r)
 
         if (i % n_report == 0 || i == n_iters) 
         {
+            clock_gettime(CLOCK_MONOTONIC, &after);
+            r->time = (double)(after.tv_sec - before.tv_sec) +
+                      (double)(after.tv_nsec - before.tv_nsec) / 1e9;
             r->niter = i;
             r->tavg  = heat_sum / n_cells;
             report_results(p, r);
