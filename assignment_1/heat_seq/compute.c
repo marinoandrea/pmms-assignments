@@ -1,5 +1,6 @@
 #include <time.h>
 #include <math.h>
+#include <float.h>
 #include <stdlib.h>
 #include <string.h>
 #include "compute.h"
@@ -59,7 +60,7 @@ void do_compute(const struct parameters *p, struct results *r)
         if (i % n_report == 0 || i == n_iters) 
         {
             r->tmax     = 0;
-            r->tmin     = 0;
+            r->tmin     = DBL_MAX;
             r->tavg     = 0;
             r->maxdiff  = 0;
         } 
@@ -110,7 +111,7 @@ void do_compute(const struct parameters *p, struct results *r)
                 if (i % n_report == 0 || i == n_iters) 
                 {
                     r->tmax     = r->tmax > next_heat ? r->tmax : next_heat; // fmax(r->tmax, next_heat);
-                    r->tmin     = r->tmin > next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
+                    r->tmin     = r->tmin < next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
                     r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff; // fmax(r->maxdiff, abs(prev_heat - next_heat));
                     heat_sum    += next_heat;
                 }
