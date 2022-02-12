@@ -10,11 +10,15 @@
 
 void do_compute(const struct parameters *p, struct results *r)
 {
-    size_t n_cols   = p->M;
-    size_t n_rows   = p->N;
-    size_t n_cells  = n_rows * n_cols;
-    size_t n_iters  = p->maxiter;
-    size_t n_report = p->period;
+    struct timespec before, after;
+    clock_gettime(CLOCK_MONOTONIC, &before);
+
+    size_t n_cols       = p->M;
+    size_t n_rows       = p->N;
+    size_t n_cells      = n_rows * n_cols;
+    size_t n_iters      = p->maxiter;
+    size_t n_report     = p->period;
+    size_t printreports = p->printreports;
 
     // Allocating memory for the matrices. The heat matrix has 2 additional rows 
     // for the halo values.
@@ -57,7 +61,6 @@ void do_compute(const struct parameters *p, struct results *r)
             r->tmin     = 0;
             r->tavg     = 0;
             r->maxdiff  = 0;
-            r->time     = 0;
         } 
 
         for (size_t row = 1; row < n_rows + 1; ++row)
@@ -117,11 +120,17 @@ void do_compute(const struct parameters *p, struct results *r)
             }
         }
 
-        if (i % n_report == 0 || i == n_iters) 
+        if (i % n_report == 0) 
         {
+            clock_gettime(CLOCK_MONOTONIC, &after);
+            r->time = (double)(after.tv_sec - before.tv_sec) +
+                      (double)(after.tv_nsec - before.tv_nsec) / 1e9;
             r->niter = i;
             r->tavg  = heat_sum / n_cells;
-            report_results(p, r);
+            if (printreports)
+            {
+                report_results(p, r);
+            }
         } 
 
         ++i;
