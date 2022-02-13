@@ -97,16 +97,17 @@ void do_compute(const struct parameters *p, struct results *r)
                 double prev_heat = m_heat_prev[idx_row + col];
                 double next_heat = (1.0 - coef) * (sum_d * COEF_D + sum_s * COEF_S) + coef * prev_heat;
 
-                double heat_abs_diff = fabs(prev_heat - next_heat);
-
                 m_heat_next[idx_row + col] = next_heat;
                 
                 if (i % n_report == 0 || i == n_iters)
                 {
+                    double heat_abs_diff = fabs(prev_heat - next_heat);
+                    
+                    heat_sum    += next_heat;
+
                     r->tmax     = r->tmax > next_heat ? r->tmax : next_heat; // fmax(r->tmax, next_heat);
                     r->tmin     = r->tmin < next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
                     r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff; // fmax(r->maxdiff, abs(prev_heat - next_heat));
-                    heat_sum    += next_heat;
                 }
 
 #ifdef DRAW_PGM
