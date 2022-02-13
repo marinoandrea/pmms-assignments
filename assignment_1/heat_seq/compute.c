@@ -2,6 +2,7 @@
 #include <math.h>
 #include <float.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "compute.h"
 
@@ -48,10 +49,13 @@ void do_compute(const struct parameters *p, struct results *r)
     {
         double heat_sum = 0;
 
-        r->niter    = i;
-        r->tmax     = 0;
-        r->tmin     = DBL_MAX;
-        r->maxdiff  = 0;
+        if (i % n_report == 0 || i == n_iters)
+        {
+            r->niter    = i;
+            r->tmax     = 0.0;
+            r->tmin     = DBL_MAX;
+            r->maxdiff  = 0.0;
+        }
 
         // swapping front and back buffer at every iteration
         double *m_heat_prev = i % 2 == 0 ? m_heat_a : m_heat_b;
@@ -87,33 +91,35 @@ void do_compute(const struct parameters *p, struct results *r)
                              + m_heat_prev[idx_row_prev + col_prev];
 
                 double prev_heat = m_heat_prev[idx_row + col];
-                double next_heat = (1 - coef) * (sum_d * COEF_D + sum_s * COEF_S) + coef * prev_heat;
+                double next_heat = (1.0 - coef) * (sum_d * COEF_D + sum_s * COEF_S) + coef * prev_heat;
 
                 double heat_abs_diff = fabs(prev_heat - next_heat);
 
                 m_heat_next[idx_row + col] = next_heat;
                 
-                // reporting values
-                r->tmax     = r->tmax > next_heat ? r->tmax : next_heat; // fmax(r->tmax, next_heat);
-                r->tmin     = r->tmin < next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
-                r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff; // fmax(r->maxdiff, abs(prev_heat - next_heat));
-                heat_sum    += next_heat;
+                if (i % n_report == 0 || i == n_iters)
+                {
+                    r->tmax     = r->tmax > next_heat ? r->tmax : next_heat; // fmax(r->tmax, next_heat);
+                    r->tmin     = r->tmin < next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
+                    r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff; // fmax(r->maxdiff, abs(prev_heat - next_heat));
+                    heat_sum    += next_heat;
+                }
 
 #ifdef DEBUG
-                draw_point(col, row - 1, prev_heat);
+                draw_point(col, row - 1, next_heat);
 #endif
             }
         }
-
-        clock_gettime(CLOCK_MONOTONIC, &after);
         
-        r->tavg  = heat_sum / n_cells;
-        r->time  = (double)(after.tv_sec - before.tv_sec) +
-                   (double)(after.tv_nsec - before.tv_nsec) / 1e9;
-        
-        if (printreports && i % n_report == 0) 
+        if (i % n_report == 0 || i == n_iters) 
         {
-            report_results(p, r);
+            clock_gettime(CLOCK_MONOTONIC, &after);
+            
+            r->tavg  = heat_sum / (double) n_cells;
+            r->time  = (double)(after.tv_sec - before.tv_sec) +
+                       (double)(after.tv_nsec - before.tv_nsec) / 1e9;
+
+            if (printreports && i != n_iters) report_results(p, r);
         }
 
         i++;
