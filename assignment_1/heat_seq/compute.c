@@ -6,10 +6,10 @@
 #include <string.h>
 #include "compute.h"
 
-// #define DEBUG
+#define DEBUG
 
-#define COEF_D 0.1035533905932737724908677
-#define COEF_S 0.1464466094067262691424958
+#define COEF_D 0.1035533905932737724
+#define COEF_S 0.1464466094067262691
 
 void do_compute(const struct parameters *p, struct results *r)
 {
@@ -24,9 +24,9 @@ void do_compute(const struct parameters *p, struct results *r)
     // for the halo values.
     // NOTE: we create 2 heat matrices in order to have a front and back buffer
     // for computation that we swap at every iteration.
-    double *m_heat_a = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
-    double *m_heat_b = (double *)malloc(sizeof(double) * (n_cells + 2 * n_cols));
-    double *m_coef   = (double *)malloc(sizeof(double) * (n_cells));
+    double *m_heat_a = (double *)calloc(n_cells + 2 * n_cols, sizeof(double));
+    double *m_heat_b = (double *)calloc(n_cells + 2 * n_cols, sizeof(double));
+    double *m_coef   = (double *)calloc(n_cells,              sizeof(double));
 
     // we copy the first and last row of the heat matrix twice for the halo values
     memcpy(m_heat_a,                    p->tinit,                      sizeof(double) * n_cols);
@@ -34,6 +34,16 @@ void do_compute(const struct parameters *p, struct results *r)
     memcpy(m_heat_a + n_cells + n_cols, p->tinit + n_cells - n_cols,   sizeof(double) * n_cols);
     memcpy(m_heat_b,                    m_heat_a,                      sizeof(double) * (n_cells + 2 * n_cols));
     memcpy(m_coef,                      p->conductivity,               sizeof(double) * n_cells);
+
+    // precomputing column boundaries to avoid redundant modulo calculations
+    size_t *lookup_prev_col = (size_t *)calloc(n_cols, sizeof(size_t));
+    size_t *lookup_next_col = (size_t *)calloc(n_cols, sizeof(size_t));
+
+    for (size_t i = 0; i < n_cols; i++)
+    {
+        lookup_prev_col[i] = i == 0 ? n_cols - 1 : i - 1;
+        lookup_next_col[i] = i == n_cols - 1 ? 0 : i + 1;
+    }
 
     // iteration number
     size_t i = 1;
@@ -77,18 +87,14 @@ void do_compute(const struct parameters *p, struct results *r)
                 // so we take the value for row - 1
                 double coef = m_coef[idx_row_prev + col];
 
-                // accounting for the cilinder wrapping around
-                size_t col_prev = (col - 1) % n_cols;
-                size_t col_next = (col + 1) % n_cols;
-
                 double sum_s = m_heat_prev[idx_row_prev + col]
-                             + m_heat_prev[idx_row      + col_next]
+                             + m_heat_prev[idx_row      + lookup_next_col[col]]
                              + m_heat_prev[idx_row_next + col]
-                             + m_heat_prev[idx_row      + col_prev];
-                double sum_d = m_heat_prev[idx_row_prev + col_next]
-                             + m_heat_prev[idx_row_next + col_next]
-                             + m_heat_prev[idx_row_next + col_prev]
-                             + m_heat_prev[idx_row_prev + col_prev];
+                             + m_heat_prev[idx_row      + lookup_prev_col[col]];
+                double sum_d = m_heat_prev[idx_row_prev + lookup_next_col[col]]
+                             + m_heat_prev[idx_row_next + lookup_next_col[col]]
+                             + m_heat_prev[idx_row_next + lookup_prev_col[col]]
+                             + m_heat_prev[idx_row_prev + lookup_prev_col[col]];
 
                 double prev_heat = m_heat_prev[idx_row + col];
                 double next_heat = (1.0 - coef) * (sum_d * COEF_D + sum_s * COEF_S) + coef * prev_heat;
