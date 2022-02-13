@@ -9,8 +9,8 @@
 
 1. Sequential C base version of heat dissipation simulation
    1. [ ] Fix `fmin` and `fmax`
-   2. [ ] Add time measurements
-   3. [ ] Generate images
+   2. [x] Add time measurements
+   3. [x] Generate images
 2. Performance impact of compilation
    1. [ ] Run code with `gcc`
    2. [ ] Run code with `icc`

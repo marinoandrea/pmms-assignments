@@ -5,10 +5,10 @@
 #include <string.h>
 #include "compute.h"
 
-#define DEBUG
+// #define DEBUG
 
-#define COEF_D 0.103553391
-#define COEF_S 0.146446609
+#define COEF_D 0.1035533905932737724908677
+#define COEF_S 0.1464466094067262691424958
 
 void do_compute(const struct parameters *p, struct results *r)
 {
@@ -37,8 +37,8 @@ void do_compute(const struct parameters *p, struct results *r)
     // iteration number
     size_t i = 1;
 
-    // we initialize this to be higher than the threshold
-    r->maxdiff  = p->threshold + 1;
+    // we initialize this to enter the while loop
+    r->maxdiff = p->threshold;
 
     // NOTE: we do not include setup operations in time calculations
     struct timespec before, after;
@@ -51,7 +51,6 @@ void do_compute(const struct parameters *p, struct results *r)
         r->niter    = i;
         r->tmax     = 0;
         r->tmin     = DBL_MAX;
-        r->tavg     = 0;
         r->maxdiff  = 0;
 
         // swapping front and back buffer at every iteration
@@ -78,27 +77,20 @@ void do_compute(const struct parameters *p, struct results *r)
                 size_t col_prev = (col - 1) % n_cols;
                 size_t col_next = (col + 1) % n_cols;
 
-                double neighbors[8]; 
-
-                // clockwise, starting at the top
-                neighbors[0] = m_heat_prev[idx_row_prev + col];
-                neighbors[1] = m_heat_prev[idx_row_prev + col_next];
-                neighbors[2] = m_heat_prev[idx_row      + col_next];
-                neighbors[3] = m_heat_prev[idx_row_next + col_next];
-                neighbors[4] = m_heat_prev[idx_row_next + col];
-                neighbors[5] = m_heat_prev[idx_row_next + col_prev];
-                neighbors[6] = m_heat_prev[idx_row      + col_prev];
-                neighbors[7] = m_heat_prev[idx_row_prev + col_prev];
-
-                // partial diagonal (d) and direct (s) sums
-                double sum_d = neighbors[1] + neighbors[3] + neighbors[5] + neighbors[7];
-                double sum_s = neighbors[0] + neighbors[2] + neighbors[4] + neighbors[6];
+                double sum_s = m_heat_prev[idx_row_prev + col]
+                             + m_heat_prev[idx_row      + col_next]
+                             + m_heat_prev[idx_row_next + col]
+                             + m_heat_prev[idx_row      + col_prev];
+                double sum_d = m_heat_prev[idx_row_prev + col_next]
+                             + m_heat_prev[idx_row_next + col_next]
+                             + m_heat_prev[idx_row_next + col_prev]
+                             + m_heat_prev[idx_row_prev + col_prev];
 
                 double prev_heat = m_heat_prev[idx_row + col];
-                double next_heat = coef * (sum_d * COEF_D + sum_s * COEF_S) + (1 - coef) * prev_heat;
+                double next_heat = (1 - coef) * (sum_d * COEF_D + sum_s * COEF_S) + coef * prev_heat;
 
                 double heat_abs_diff = fabs(prev_heat - next_heat);
-                
+
                 m_heat_next[idx_row + col] = next_heat;
                 
                 // reporting values
