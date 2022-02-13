@@ -6,8 +6,6 @@
 #include <string.h>
 #include "compute.h"
 
-#define DEBUG
-
 #define COEF_D 0.1035533905932737724
 #define COEF_S 0.1464466094067262691
 
@@ -71,7 +69,7 @@ void do_compute(const struct parameters *p, struct results *r)
         double *m_heat_prev = i % 2 == 0 ? m_heat_a : m_heat_b;
         double *m_heat_next = i % 2 == 0 ? m_heat_b : m_heat_a;
 
-#ifdef DEBUG
+#ifdef DRAW_PGM
         begin_picture(i, n_cols, n_rows, p->io_tmin, p->io_tmax);
 #endif
 
@@ -111,7 +109,7 @@ void do_compute(const struct parameters *p, struct results *r)
                     heat_sum    += next_heat;
                 }
 
-#ifdef DEBUG
+#ifdef DRAW_PGM
                 draw_point(col, row - 1, next_heat);
 #endif
             }
@@ -130,7 +128,7 @@ void do_compute(const struct parameters *p, struct results *r)
 
         i++;
 
-#ifdef DEBUG
+#ifdef DRAW_PGM
         end_picture();
 #endif
     }
