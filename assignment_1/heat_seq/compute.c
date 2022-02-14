@@ -2,7 +2,6 @@
 #include <math.h>
 #include <float.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include "compute.h"
 
@@ -108,10 +107,6 @@ void do_compute(const struct parameters *p, struct results *r)
                     r->tmax     = fmax(r->tmax, next_heat);
                     r->tmin     = fmin(r->tmin, next_heat);
                     r->maxdiff  = fmax(r->maxdiff, heat_abs_diff);
-
-                    // r->tmax     = r->tmax > next_heat ? r->tmax : next_heat;
-                    // r->tmin     = r->tmin < next_heat ? r->tmin : next_heat;
-                    // r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff;
                 }
 
 #ifdef DRAW_PGM
@@ -138,6 +133,8 @@ void do_compute(const struct parameters *p, struct results *r)
 #endif
     }
 
+    free(lookup_next_col);
+    free(lookup_prev_col);
     free(m_coef);
     free(m_heat_a);
     free(m_heat_b);
