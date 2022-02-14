@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include "compute.h"
 
+
+#define DRAW_PGM
+
 #define COEF_D 0.1035533905932737724
 #define COEF_S 0.1464466094067262691
 
@@ -59,20 +62,24 @@ void do_compute(const struct parameters *p, struct results *r)
             {
                 m_heat_a[idx_pad_row + col] = p->tinit[idx_row + col];
                 m_heat_b[idx_pad_row + col] = p->tinit[idx_row + col];
+                // printf("%0.2lf ", m_heat_a[idx_pad_row + col]);
             } 
             // bottom halo
             else if (row == n_rows + 1)
             {
                 m_heat_a[idx_pad_row + col] = p->tinit[(n_rows - 1) * n_cols + col];
                 m_heat_b[idx_pad_row + col] = p->tinit[(n_rows - 1) * n_cols + col];
+                // printf("%0.2lf ", m_heat_a[idx_pad_row + col]);
             }
             // actual matrix
             else 
             {
                 m_heat_a[idx_pad_row + col] = p->tinit[idx_row_prev + col];
                 m_heat_b[idx_pad_row + col] = p->tinit[idx_row_prev + col];
+                // printf("%0.2lf ", m_heat_a[idx_pad_row + col]);
             }
         }
+        // printf("\n");
     }
 
     for (size_t row = 0; row < n_rows; row++)
@@ -128,9 +135,9 @@ void do_compute(const struct parameters *p, struct results *r)
 
         for (size_t row = 1; row < n_rows + 1; ++row)
         {
-            size_t idx_row      = row * n_cols;
-            size_t idx_row_prev = idx_row - n_cols;
-            size_t idx_row_next = idx_row + n_cols;
+            size_t idx_row      = row * (n_cols + n_pad_cols);
+            size_t idx_row_prev = idx_row - (n_cols + n_pad_cols);
+            size_t idx_row_next = idx_row + (n_cols + n_pad_cols);
 
             for (size_t col = 0; col < n_cols; col += 4)
             {
@@ -144,42 +151,42 @@ void do_compute(const struct parameters *p, struct results *r)
                 __m256d neighbors_t = _mm256_loadu_pd(&m_heat_prev[idx_row_prev + col1]);
                 __m256d neighbors_b = _mm256_loadu_pd(&m_heat_prev[idx_row_next + col1]);
                 __m256d neighbors_l = _mm256_set_pd(
-                    m_heat_prev[idx_row + lookup_prev_col[col1]],
-                    m_heat_prev[idx_row + lookup_prev_col[col2]],
+                    m_heat_prev[idx_row + lookup_prev_col[col4]],
                     m_heat_prev[idx_row + lookup_prev_col[col3]],
-                    m_heat_prev[idx_row + lookup_prev_col[col4]]
+                    m_heat_prev[idx_row + lookup_prev_col[col2]],
+                    m_heat_prev[idx_row + lookup_prev_col[col1]]
                 );
                 __m256d neighbors_r = _mm256_set_pd(
-                    m_heat_prev[idx_row + lookup_next_col[col1]],
-                    m_heat_prev[idx_row + lookup_next_col[col2]],
+                    m_heat_prev[idx_row + lookup_next_col[col4]],
                     m_heat_prev[idx_row + lookup_next_col[col3]],
-                    m_heat_prev[idx_row + lookup_next_col[col4]]
+                    m_heat_prev[idx_row + lookup_next_col[col2]],
+                    m_heat_prev[idx_row + lookup_next_col[col1]]
                 );
 
                 // diagonal neighbors
                 __m256d neighbors_tl = _mm256_set_pd(
-                    m_heat_prev[idx_row_prev + lookup_prev_col[col1]],
-                    m_heat_prev[idx_row_prev + lookup_prev_col[col2]],
+                    m_heat_prev[idx_row_prev + lookup_prev_col[col4]],
                     m_heat_prev[idx_row_prev + lookup_prev_col[col3]],
-                    m_heat_prev[idx_row_prev + lookup_prev_col[col4]]
+                    m_heat_prev[idx_row_prev + lookup_prev_col[col2]],
+                    m_heat_prev[idx_row_prev + lookup_prev_col[col1]]
                 );
                 __m256d neighbors_tr = _mm256_set_pd(
-                    m_heat_prev[idx_row_prev + lookup_next_col[col1]],
-                    m_heat_prev[idx_row_prev + lookup_next_col[col2]],
+                    m_heat_prev[idx_row_prev + lookup_next_col[col4]],
                     m_heat_prev[idx_row_prev + lookup_next_col[col3]],
-                    m_heat_prev[idx_row_prev + lookup_next_col[col4]]
+                    m_heat_prev[idx_row_prev + lookup_next_col[col2]],
+                    m_heat_prev[idx_row_prev + lookup_next_col[col1]]
                 );
                 __m256d neighbors_br = _mm256_set_pd(
-                    m_heat_prev[idx_row_next + lookup_next_col[col1]],
-                    m_heat_prev[idx_row_next + lookup_next_col[col2]],
+                    m_heat_prev[idx_row_next + lookup_next_col[col4]],
                     m_heat_prev[idx_row_next + lookup_next_col[col3]],
-                    m_heat_prev[idx_row_next + lookup_next_col[col4]]
+                    m_heat_prev[idx_row_next + lookup_next_col[col2]],
+                    m_heat_prev[idx_row_next + lookup_next_col[col1]]
                 );
                 __m256d neighbors_bl = _mm256_set_pd(
-                    m_heat_prev[idx_row_next + lookup_prev_col[col1]],
-                    m_heat_prev[idx_row_next + lookup_prev_col[col2]],
+                    m_heat_prev[idx_row_next + lookup_prev_col[col4]],
                     m_heat_prev[idx_row_next + lookup_prev_col[col3]],
-                    m_heat_prev[idx_row_next + lookup_prev_col[col4]]
+                    m_heat_prev[idx_row_next + lookup_prev_col[col2]],
+                    m_heat_prev[idx_row_next + lookup_prev_col[col1]]
                 );
 
                 // previous temperatures
