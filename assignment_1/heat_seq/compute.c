@@ -94,9 +94,14 @@ void do_compute(const struct parameters *p, struct results *r)
                 m_heat_next[idx_row + col] = next_heat;
                 
                 // reporting values
-                r->tmax     = r->tmax > next_heat ? r->tmax : next_heat; // fmax(r->tmax, next_heat);
-                r->tmin     = r->tmin < next_heat ? r->tmin : next_heat; // fmin(r->tmin, next_heat);
-                r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff; // fmax(r->maxdiff, abs(prev_heat - next_heat));
+                r->tmax     = fmax(r->tmax, next_heat);
+                r->tmin     = fmin(r->tmin, next_heat);
+                r->maxdiff  = fmax(r->maxdiff, fabs(prev_heat - next_heat));
+
+                // r->tmax     = r->tmax > next_heat ? r->tmax : next_heat;
+                // r->tmin     = r->tmin < next_heat ? r->tmin : next_heat;
+                // r->maxdiff  = r->maxdiff > heat_abs_diff ? r->maxdiff : heat_abs_diff;
+
                 heat_sum    += next_heat;
 
 #ifdef DEBUG
