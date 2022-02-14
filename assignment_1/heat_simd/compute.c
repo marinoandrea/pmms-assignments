@@ -32,9 +32,9 @@ void do_compute(const struct parameters *p, struct results *r)
     // for the halo values.
     // NOTE: we create 2 heat matrices in order to have a front and back buffer
     // for computation that we swap at every iteration.
-    double *m_heat_a = (double *)calloc(n_pad_cells + 2 * (n_cols + n_pad_cols), sizeof(double));
-    double *m_heat_b = (double *)calloc(n_pad_cells + 2 * (n_cols + n_pad_cols), sizeof(double));
-    double *m_coef   = (double *)calloc(n_pad_cells,                             sizeof(double));
+    double *m_heat_a = (double *)_mm_malloc(sizeof(double) * (n_pad_cells + 2 * (n_cols + n_pad_cols)), 32);
+    double *m_heat_b = (double *)_mm_malloc(sizeof(double) * (n_pad_cells + 2 * (n_cols + n_pad_cols)), 32);
+    double *m_coef   = (double *)_mm_malloc(sizeof(double) * (n_pad_cells),                             32);
 
     /*
     NOTE:
@@ -147,8 +147,8 @@ void do_compute(const struct parameters *p, struct results *r)
 
                 // loading AVX data structures
                 // simple neighbors
-                __m256d neighbors_t = _mm256_loadu_pd(&m_heat_prev[idx_row_prev + col1]);
-                __m256d neighbors_b = _mm256_loadu_pd(&m_heat_prev[idx_row_next + col1]);
+                __m256d neighbors_t = _mm256_load_pd(&m_heat_prev[idx_row_prev + col1]);
+                __m256d neighbors_b = _mm256_load_pd(&m_heat_prev[idx_row_next + col1]);
                 __m256d neighbors_l = _mm256_set_pd(
                     m_heat_prev[idx_row + lookup_prev_col[col4]],
                     m_heat_prev[idx_row + lookup_prev_col[col3]],
@@ -189,10 +189,10 @@ void do_compute(const struct parameters *p, struct results *r)
                 );
 
                 // previous temperatures
-                __m256d prev_heat = _mm256_loadu_pd(&m_heat_prev[idx_row + col1]);
+                __m256d prev_heat = _mm256_load_pd(&m_heat_prev[idx_row + col1]);
 
                 // coefficients
-                __m256d coefs   = _mm256_loadu_pd(&m_coef[idx_row_prev + col1]);                
+                __m256d coefs   = _mm256_load_pd(&m_coef[idx_row_prev + col1]);                
                 __m256d coefs_r = _mm256_sub_pd(ones, coefs);
 
                 // simulation logic
@@ -204,14 +204,9 @@ void do_compute(const struct parameters *p, struct results *r)
                 __m256d sum_neighbors_brbl = _mm256_add_pd(neighbors_br, neighbors_bl);
                 __m256d sum_d              = _mm256_add_pd(sum_neighbors_tltr, sum_neighbors_brbl);
 
-                __m256d sum_d_coef_d  = _mm256_mul_pd(sum_d, coef_d);
-                __m256d sum_s_coef_s  = _mm256_mul_pd(sum_s, coef_s);
-                __m256d sum_neighbors = _mm256_add_pd(sum_d_coef_d, sum_s_coef_s);
-                
-                __m256d w_neighbors   = _mm256_mul_pd(coefs_r, sum_neighbors);
-                __m256d w_previous    = _mm256_mul_pd(coefs, prev_heat);
+                __m256d sum_neighbors = _mm256_fmadd_pd(sum_s, coef_s,    _mm256_mul_pd(sum_d, coef_d));                
+                __m256d next_heat     = _mm256_fmadd_pd(coefs, prev_heat, _mm256_mul_pd(coefs_r, sum_neighbors));
 
-                __m256d next_heat = _mm256_add_pd(w_neighbors, w_previous);
                 double *next_heat_ptr = (double *)&next_heat;
 
                 m_heat_next[idx_row + col1] = next_heat_ptr[0];
@@ -277,7 +272,7 @@ void do_compute(const struct parameters *p, struct results *r)
 #endif
     }
 
-    free(m_coef);
-    free(m_heat_a);
-    free(m_heat_b);
+    _mm_free(m_coef);
+    _mm_free(m_heat_a);
+    _mm_free(m_heat_b);
 }
