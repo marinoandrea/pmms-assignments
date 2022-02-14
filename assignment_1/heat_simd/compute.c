@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include "compute.h"
 
-
-#define DRAW_PGM
+#pragma STDC FP_CONTRACT ON 
 
 #define COEF_D 0.1035533905932737724
 #define COEF_S 0.1464466094067262691
