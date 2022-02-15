@@ -55,10 +55,17 @@ A list of all installed compiler intrinsics for GCC, everything that is not pres
 ```bash
 alias intrinsics="gcc -v -xc /dev/null -O3 -march=native -o- -E 2>&1 | grep -o -- '-m[-a-z0-9=]*'"
 ```
-Clean, make, and run with a single command:
+
+Clean, make, and run with a single command (sequential):
 
 ```bash
 make clean && make && ./heat_seq -n 150 -m 100 -i 42 -e 0.0001 -c ../../images/pat1_100x150.pgm -t ../../images/pat1_100x150.pgm -r 1 -k 10 -L 0 -H 100
+```
+
+Clean, make, and run with a single command (SIMD):
+
+```bash
+make clean && make && ./heat_simd -n 150 -m 100 -i 42 -e 0.0001 -c ../../images/pat1_100x150.pgm -t ../../images/pat1_100x150.pgm -r 1 -k 10 -L 0 -H 100
 ```
 
 ### DAS-5
