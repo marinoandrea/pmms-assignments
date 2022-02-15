@@ -8,7 +8,7 @@
 ## Todo
 
 1. Sequential C base version of heat dissipation simulation
-   1. [ ] Fix `fmin` and `fmax`
+   1. [x] Fix `fmin` and `fmax`
    2. [x] Add time measurements
    3. [x] Generate images
 2. Performance impact of compilation
@@ -16,10 +16,10 @@
    2. [ ] Run code with `icc`
    3. [ ] Run code with other compilers, maybe `clang`? _(optional)_
    4. [ ] Add compiler-specific performance optimizations
+   5. [ ] Collect and clean results from compiler comparison
 3. Experimentation with sequential heat dissipation code
-   1. [ ] Collect and clean results from compiler comparison
-   2. [ ] Run code with varying parameter sets
-   3. [ ] Run code with wide and tall orientations, but the same shape (N x M versus M x N)
+   1. [ ] Run code with varying parameter sets
+   2. [ ] Run code with wide and tall orientations, but the same shape (N x M versus M x N)
 5. Vectorisation (SIMD)
    1. [ ] Hand-vectorize sequential code
    2. [ ] Automatically vectorize using compiler flags, pragmas, code rewriting
@@ -28,6 +28,7 @@
    1. [ ] Intro
    2. [ ] Experimental results
    3. [ ] Graphs
+   4. [ ] ...
 
 ## Useful commands
 
@@ -55,10 +56,17 @@ A list of all installed compiler intrinsics for GCC, everything that is not pres
 ```bash
 alias intrinsics="gcc -v -xc /dev/null -O3 -march=native -o- -E 2>&1 | grep -o -- '-m[-a-z0-9=]*'"
 ```
-Clean, make, and run with a single command:
+
+Clean, make, and run with a single command (sequential):
 
 ```bash
 make clean && make && ./heat_seq -n 150 -m 100 -i 42 -e 0.0001 -c ../../images/pat1_100x150.pgm -t ../../images/pat1_100x150.pgm -r 1 -k 10 -L 0 -H 100
+```
+
+Clean, make, and run with a single command (SIMD):
+
+```bash
+make clean && make && ./heat_simd -n 150 -m 100 -i 42 -e 0.0001 -c ../../images/pat1_100x150.pgm -t ../../images/pat1_100x150.pgm -r 1 -k 10 -L 0 -H 100
 ```
 
 ### DAS-5
