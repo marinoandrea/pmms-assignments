@@ -21,8 +21,10 @@ void do_compute(const struct parameters *p, struct results *r)
     size_t n_report     = p->period;
     size_t printreports = p->printreports;
 
-    size_t n_pad_cols   = n_cols % 4;
+    size_t n_cpy_cols   = 2;
+    size_t n_pad_cols   = n_cols % 4 - 1;
     size_t n_pad_cells  = (n_cols + n_pad_cols) * n_rows;
+    size_t n_tot_cells  = (n_cols + n_pad_cols + n_cpy_cols) * n_rows;
 
     __m256d coef_d = _mm256_set_pd(COEF_D, COEF_D, COEF_D, COEF_D);
     __m256d coef_s = _mm256_set_pd(COEF_S, COEF_S, COEF_S, COEF_S);
@@ -32,21 +34,31 @@ void do_compute(const struct parameters *p, struct results *r)
     // for the halo values.
     // NOTE: we create 2 heat matrices in order to have a front and back buffer
     // for computation that we swap at every iteration.
-    double *m_heat_a = (double *)_mm_malloc(sizeof(double) * (n_pad_cells + 2 * (n_cols + n_pad_cols)), 32);
-    double *m_heat_b = (double *)_mm_malloc(sizeof(double) * (n_pad_cells + 2 * (n_cols + n_pad_cols)), 32);
-    double *m_coef   = (double *)_mm_malloc(sizeof(double) * (n_pad_cells),                             32);
+    double *m_heat_a = (double *)_mm_malloc(sizeof(double) * (n_tot_cells + 2 * (n_cols + n_pad_cols + n_cpy_cols)), 32);
+    double *m_heat_b = (double *)_mm_malloc(sizeof(double) * (n_tot_cells + 2 * (n_cols + n_pad_cols + n_cpy_cols)), 32);
+    double *m_coef   = (double *)_mm_malloc(sizeof(double) * (n_pad_cells),                                          32);
 
     /*
     NOTE:
-    Our matrices now have padding on the right side. Therefore, we cannot use
-    memcpy in the same way we did for the sequential implementation.
+    Our matrices now have padding on the right side and copycat columns. 
+    Therefore, we cannot use memcpy in the same way we did for the 
+    sequential implementation.
 
-    hhh...pp
-    xxx...pp
-    xxx...pp
-    hhh...pp
+    c   x x x x x   c   p p
+    -----------------------
+    1 | 1 0 0 0 0 | 0 | 0 0
+    0 | 0 1 0 0 0 | 0 | 0 0
 
-    where h = halo, x = value, p = padding (zero init).
+    0 | 0 0 0 | 0
+    0 | 0 0 0 | 0
+    1 | 1 0 1 | 1
+
+    h1h1h2h...hNpp
+    x1x1x2x...xNpp
+    x1x1x2x...xNpp
+    h1h1h2h...hNpp
+
+    where h = halo, x = value, p = padding (zero init), c = copycat.
     */    
     for (size_t row = 0; row < n_rows + 2; row++)
     {
@@ -54,32 +66,60 @@ void do_compute(const struct parameters *p, struct results *r)
         size_t idx_pad_row  = row * (n_cols + n_pad_cols);
         size_t idx_row_prev = idx_row - n_cols;
 
-        for (size_t col = 0; col < n_cols; col++)
+        for (size_t col = 0; col < n_cols + 2; col++)
         {
             // top halo
             if (row == 0)
             {
-                m_heat_a[idx_pad_row + col] = p->tinit[idx_row + col];
-                m_heat_b[idx_pad_row + col] = p->tinit[idx_row + col];
-                // printf("%0.2lf ", m_heat_a[idx_pad_row + col]);
+                if (col == 0)
+                {
+                    m_heat_a[idx_pad_row] = p->tinit[idx_row];
+                }
+                else if (col == n_cols + n_cpy_cols - 1)
+                {
+                    m_heat_a[idx_pad_row + col] = p->tinit[idx_row + col - 2];
+                }
+                else
+                {
+                    m_heat_a[idx_pad_row + col] = p->tinit[idx_row + col - 1];
+                }
             } 
             // bottom halo
             else if (row == n_rows + 1)
             {
-                m_heat_a[idx_pad_row + col] = p->tinit[(n_rows - 1) * n_cols + col];
-                m_heat_b[idx_pad_row + col] = p->tinit[(n_rows - 1) * n_cols + col];
-                // printf("%0.2lf ", m_heat_a[idx_pad_row + col]);
+                if (col == 0)
+                {
+                    m_heat_a[idx_pad_row] = p->tinit[(n_rows - 1) * n_cols];
+                }
+                else if (col == n_cols + n_cpy_cols - 1)
+                {
+                    m_heat_a[idx_pad_row + col] = p->tinit[(n_rows - 1) * n_cols + col - 2];
+                }
+                else
+                {
+                    m_heat_a[idx_pad_row + col] = p->tinit[(n_rows - 1) * n_cols + col - 1];
+                }
             }
             // actual matrix
             else 
             {
-                m_heat_a[idx_pad_row + col] = p->tinit[idx_row_prev + col];
-                m_heat_b[idx_pad_row + col] = p->tinit[idx_row_prev + col];
-                // printf("%0.2lf ", m_heat_a[idx_pad_row + col]);
+                if (col == 0)
+                {
+                    m_heat_a[idx_pad_row] = p->tinit[idx_row_prev];
+                }
+                else if (col == n_cols + n_cpy_cols - 1)
+                {
+                    m_heat_a[idx_pad_row + col] = p->tinit[idx_row_prev + col - 2];
+                }
+                else
+                {
+                    m_heat_a[idx_pad_row + col] = p->tinit[idx_row_prev + col - 1];
+                }
             }
         }
-        // printf("\n");
     }
+
+    memcpy(m_heat_b, m_heat_a, sizeof(double) * (n_tot_cells + + 2 * (n_cols + n_pad_cols + n_cpy_cols)));
 
     for (size_t row = 0; row < n_rows; row++)
     {
@@ -90,16 +130,6 @@ void do_compute(const struct parameters *p, struct results *r)
         {
             m_coef[idx_pad_row + col] = p->conductivity[idx_row + col];
         }
-    }
-
-    // precomputing column boundaries to avoid redundant modulo calculations
-    size_t *lookup_prev_col = (size_t *)calloc((n_cols + n_pad_cols), sizeof(size_t));
-    size_t *lookup_next_col = (size_t *)calloc((n_cols + n_pad_cols), sizeof(size_t));
-
-    for (size_t i = 0; i < n_cols; i++)
-    {
-        lookup_prev_col[i] = i == 0 ? n_cols - 1 : i - 1;
-        lookup_next_col[i] = i == n_cols - 1 ? 0 : i + 1;
     }
 
     // iteration number
@@ -138,61 +168,28 @@ void do_compute(const struct parameters *p, struct results *r)
             size_t idx_row_prev = idx_row - (n_cols + n_pad_cols);
             size_t idx_row_next = idx_row + (n_cols + n_pad_cols);
 
-            for (size_t col = 0; col < n_cols; col += 4)
+            for (size_t col = 1; col < n_cols + 1; col += 4)
             {
-                size_t col1 = col;
-                size_t col2 = col + 1;
-                size_t col3 = col + 2;
-                size_t col4 = col + 3;
+                size_t col_prev = col - 1;
+                size_t col_next = col + 1;
 
                 // loading AVX data structures
                 // simple neighbors
-                __m256d neighbors_t = _mm256_load_pd(&m_heat_prev[idx_row_prev + col1]);
-                __m256d neighbors_b = _mm256_load_pd(&m_heat_prev[idx_row_next + col1]);
-                __m256d neighbors_l = _mm256_set_pd(
-                    m_heat_prev[idx_row + lookup_prev_col[col4]],
-                    m_heat_prev[idx_row + lookup_prev_col[col3]],
-                    m_heat_prev[idx_row + lookup_prev_col[col2]],
-                    m_heat_prev[idx_row + lookup_prev_col[col1]]
-                );
-                __m256d neighbors_r = _mm256_set_pd(
-                    m_heat_prev[idx_row + lookup_next_col[col4]],
-                    m_heat_prev[idx_row + lookup_next_col[col3]],
-                    m_heat_prev[idx_row + lookup_next_col[col2]],
-                    m_heat_prev[idx_row + lookup_next_col[col1]]
-                );
-
+                __m256d neighbors_t  = _mm256_load_pd(&m_heat_prev[idx_row_prev + col]);
+                __m256d neighbors_b  = _mm256_load_pd(&m_heat_prev[idx_row_next + col]);
+                __m256d neighbors_l  = _mm256_load_pd(&m_heat_prev[idx_row + col_prev]);
+                __m256d neighbors_r  = _mm256_load_pd(&m_heat_prev[idx_row + col_next]);
                 // diagonal neighbors
-                __m256d neighbors_tl = _mm256_set_pd(
-                    m_heat_prev[idx_row_prev + lookup_prev_col[col4]],
-                    m_heat_prev[idx_row_prev + lookup_prev_col[col3]],
-                    m_heat_prev[idx_row_prev + lookup_prev_col[col2]],
-                    m_heat_prev[idx_row_prev + lookup_prev_col[col1]]
-                );
-                __m256d neighbors_tr = _mm256_set_pd(
-                    m_heat_prev[idx_row_prev + lookup_next_col[col4]],
-                    m_heat_prev[idx_row_prev + lookup_next_col[col3]],
-                    m_heat_prev[idx_row_prev + lookup_next_col[col2]],
-                    m_heat_prev[idx_row_prev + lookup_next_col[col1]]
-                );
-                __m256d neighbors_br = _mm256_set_pd(
-                    m_heat_prev[idx_row_next + lookup_next_col[col4]],
-                    m_heat_prev[idx_row_next + lookup_next_col[col3]],
-                    m_heat_prev[idx_row_next + lookup_next_col[col2]],
-                    m_heat_prev[idx_row_next + lookup_next_col[col1]]
-                );
-                __m256d neighbors_bl = _mm256_set_pd(
-                    m_heat_prev[idx_row_next + lookup_prev_col[col4]],
-                    m_heat_prev[idx_row_next + lookup_prev_col[col3]],
-                    m_heat_prev[idx_row_next + lookup_prev_col[col2]],
-                    m_heat_prev[idx_row_next + lookup_prev_col[col1]]
-                );
+                __m256d neighbors_tl = _mm256_load_pd(&m_heat_prev[idx_row_prev + col_prev]);
+                __m256d neighbors_tr = _mm256_load_pd(&m_heat_prev[idx_row_prev + col_next]);
+                __m256d neighbors_br = _mm256_load_pd(&m_heat_prev[idx_row_next + col_next]);
+                __m256d neighbors_bl = _mm256_load_pd(&m_heat_prev[idx_row_next + col_prev]);
 
                 // previous temperatures
-                __m256d prev_heat = _mm256_load_pd(&m_heat_prev[idx_row + col1]);
+                __m256d prev_heat = _mm256_load_pd(&m_heat_prev[idx_row + col]);
 
-                // coefficients
-                __m256d coefs   = _mm256_load_pd(&m_coef[idx_row_prev + col1]);                
+                // coefficients (this matrix does not have copycat columns)
+                __m256d coefs   = _mm256_load_pd(&m_coef[idx_row_prev + col_prev]);                
                 __m256d coefs_r = _mm256_sub_pd(ones, coefs);
 
                 // simulation logic
@@ -209,11 +206,26 @@ void do_compute(const struct parameters *p, struct results *r)
 
                 double *next_heat_ptr = (double *)&next_heat;
 
-                m_heat_next[idx_row + col1] = next_heat_ptr[0];
-                if (col2 < n_cols) m_heat_next[idx_row + col2] = next_heat_ptr[1];
-                if (col3 < n_cols) m_heat_next[idx_row + col3] = next_heat_ptr[2];
-                if (col4 < n_cols) m_heat_next[idx_row + col4] = next_heat_ptr[3];
-                
+                size_t col2 = col + 1;
+                size_t col3 = col + 2;
+                size_t col4 = col + 3;
+
+                // update next temperature value
+                m_heat_next[idx_row + col] = next_heat_ptr[0];
+                if (col2 < n_cols + 1) m_heat_next[idx_row + col + 1] = next_heat_ptr[1];
+                if (col3 < n_cols + 1) m_heat_next[idx_row + col + 2] = next_heat_ptr[2];
+                if (col4 < n_cols + 1) m_heat_next[idx_row + col + 3] = next_heat_ptr[3];
+
+                // update duplicate boundaries
+                if (col == 1)
+                {
+                    m_heat_next[idx_row + n_cols + 1] = next_heat_ptr[0];
+                }
+                else if (col == n_cols)
+                { 
+                    m_heat_next[idx_row] = next_heat_ptr[0];
+                }
+
                 if (i % n_report == 0 || i == n_iters)
                 {
                     __m256d heat_abs_diff = _mm256_sub_pd(prev_heat, next_heat);
@@ -225,24 +237,24 @@ void do_compute(const struct parameters *p, struct results *r)
                     heat_abs_diff_ptr[3] = fabs(heat_abs_diff_ptr[3]);
 
                     heat_sum += next_heat_ptr[0];
-                    if (col2 < n_cols) heat_sum += next_heat_ptr[1];
-                    if (col3 < n_cols) heat_sum += next_heat_ptr[2];
-                    if (col4 < n_cols) heat_sum += next_heat_ptr[3];
+                    if (col2 < n_cols + 1) heat_sum += next_heat_ptr[1];
+                    if (col3 < n_cols + 1) heat_sum += next_heat_ptr[2];
+                    if (col4 < n_cols + 1) heat_sum += next_heat_ptr[3];
 
-                    r->tmax = r->tmax > next_heat_ptr[0] ? r->tmax : next_heat_ptr[0];
-                    if (col2 < n_cols) r->tmax > next_heat_ptr[1] ? r->tmax : next_heat_ptr[1];
-                    if (col3 < n_cols) r->tmax > next_heat_ptr[2] ? r->tmax : next_heat_ptr[2];
-                    if (col4 < n_cols) r->tmax > next_heat_ptr[3] ? r->tmax : next_heat_ptr[3];
+                    r->tmax = fmax(r->tmax, next_heat_ptr[0]);
+                    if (col2 < n_cols + 1) fmax(r->tmax, next_heat_ptr[1]);
+                    if (col3 < n_cols + 1) fmax(r->tmax, next_heat_ptr[2]);
+                    if (col4 < n_cols + 1) fmax(r->tmax, next_heat_ptr[3]);
 
-                    r->tmin = r->tmin < next_heat_ptr[0] ? r->tmin : next_heat_ptr[0];
-                    if (col2 < n_cols) r->tmin < next_heat_ptr[1] ? r->tmin : next_heat_ptr[1];
-                    if (col3 < n_cols) r->tmin < next_heat_ptr[2] ? r->tmin : next_heat_ptr[2];
-                    if (col4 < n_cols) r->tmin < next_heat_ptr[3] ? r->tmin : next_heat_ptr[3];
+                    r->tmin = fmin(r->tmin, next_heat_ptr[0]);
+                    if (col2 < n_cols + 1) fmin(r->tmin, next_heat_ptr[1]);
+                    if (col3 < n_cols + 1) fmin(r->tmin, next_heat_ptr[2]);
+                    if (col4 < n_cols + 1) fmin(r->tmin, next_heat_ptr[3]);
 
-                    r->maxdiff = r->maxdiff > heat_abs_diff_ptr[0] ? r->maxdiff : heat_abs_diff_ptr[0];
-                    if (col2 < n_cols) r->maxdiff > heat_abs_diff_ptr[1] ? r->maxdiff : heat_abs_diff_ptr[1];
-                    if (col3 < n_cols) r->maxdiff > heat_abs_diff_ptr[2] ? r->maxdiff : heat_abs_diff_ptr[2];
-                    if (col4 < n_cols) r->maxdiff > heat_abs_diff_ptr[3] ? r->maxdiff : heat_abs_diff_ptr[3];
+                    r->maxdiff = fmax(r->maxdiff, heat_abs_diff_ptr[0]);
+                    if (col2 < n_cols + 1) fmax(r->maxdiff, heat_abs_diff_ptr[1]);
+                    if (col3 < n_cols + 1) fmax(r->maxdiff, heat_abs_diff_ptr[2]);
+                    if (col4 < n_cols + 1) fmax(r->maxdiff, heat_abs_diff_ptr[3]);
                 }
 
 #ifdef DRAW_PGM
