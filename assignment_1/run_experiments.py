@@ -36,7 +36,7 @@ cc_flags = {
 
 def main():
 
-    results: list[dict] = []
+    results = []
 
     input_files = list(filter(lambda x: '.pgm' in x, os.listdir(INPUT_FOLDER)))
 
@@ -49,7 +49,7 @@ def main():
             create_simd_makefile(compiler, flags)
 
             process_pool = mp.Pool()
-            tasks: list[dict] = []
+            tasks = []
 
             try:
                 run_build()
@@ -109,7 +109,7 @@ def main():
             f.write(f"{out}\n")
 
 
-def run_experiment(exp_input: dict) -> dict:
+def run_experiment(exp_input):
     output = subprocess.check_output([
         *CMD_PREFIX,
         f"./heat_{exp_input.strategy}/heat_{exp_input.strategy}",
@@ -140,7 +140,7 @@ def run_experiment(exp_input: dict) -> dict:
     }
 
 
-def parse_matrix_size(file_path: str) -> tuple[int, int]:
+def parse_matrix_size(file_path):
     match = re.search(r'^.*_(\d+)x(\d+).pgm$', file_path)
     if match is None:
         raise ValueError("This file is not a PGM matrix.")
@@ -154,7 +154,7 @@ def run_build():
     subprocess.check_call(['make'], cwd="./heat_simd")
 
 
-def create_seq_makefile(compiler: str, flags: str):
+def create_seq_makefile(compiler, flags):
     makefile_string = f"""
 CURR_DIR=$(notdir $(basename $(shell pwd)))
 PRJ=$(CURR_DIR)
@@ -186,7 +186,7 @@ clean:
         f.write(makefile_string)
 
 
-def create_simd_makefile(compiler: str, flags: str):
+def create_simd_makefile(compiler, flags):
     makefile_string = f"""
 CURR_DIR=$(notdir $(basename $(shell pwd)))
 PRJ=$(CURR_DIR)
