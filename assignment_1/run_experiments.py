@@ -25,9 +25,10 @@ cc_flags = {
         '-O3 -mavx2 -mfma',
         '-O3 -mavx2 -mfma -ffast-math',
     ],
-    # 'icc': [
-
-    # ],
+    'icc': [
+        '-O2 -mavx2 -mfma',
+        '-O3 -mavx2 -mfma',
+    ]
     # 'clang': [
 
     # ],
@@ -86,7 +87,7 @@ def main():
                 tasks.clear()
 
     with open("PMMS_experiments.tsv", 'w') as f:
-        f.write("idx\tstrategy\ttime\ttflops\ttmin\ttmax\ttdif\ttavg\tcompiler\tflags\tn_cols\tn_rows\tperiod\tmax_iter\tthreshold\n")
+        f.write("idx\tinput_file\tstrategy\ttime\ttflops\ttmin\ttmax\ttdif\ttavg\tcompiler\tflags\tn_cols\tn_rows\tperiod\tmax_iter\tthreshold\n")
         for idx, result in enumerate(results):
             out = '\t'.join([
                 str(idx),
@@ -122,7 +123,7 @@ def run_experiment(exp_input):
         "-k", str(exp_input['period']),
         "-L", "0",
         "-H", "100"
-    ], text=True)
+    ]).decode('utf-8')
 
     last_line = output.splitlines()[-1]
     _, tmin, tmax, tdif, tavg, time, tflops = list(
@@ -131,12 +132,12 @@ def run_experiment(exp_input):
 
     return {
         **exp_input,
-        time: time,
-        tflops: tflops,
-        tmax: tmax,
-        tmin: tmin,
-        tdif: tdif,
-        tavg: tavg
+        'time': time,
+        'tflops': tflops,
+        'tmax': tmax,
+        'tmin': tmin,
+        'tdif': tdif,
+        'tavg': tavg
     }
 
 
