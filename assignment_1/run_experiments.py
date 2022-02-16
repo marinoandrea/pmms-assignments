@@ -112,14 +112,14 @@ def main():
 def run_experiment(exp_input):
     output = subprocess.check_output([
         *CMD_PREFIX,
-        f"./heat_{exp_input.strategy}/heat_{exp_input.strategy}",
-        "-m", str(exp_input.n_cols),
-        "-n", str(exp_input.n_rows),
-        "-i", str(exp_input.max_iter),
-        "-e", str(exp_input.threshold),
-        "-c", f"{INPUT_FOLDER}/{exp_input.input_file}",
-        "-t", f"{INPUT_FOLDER}/{exp_input.input_file}",
-        "-k", str(exp_input.period),
+        f"./heat_{exp_input['strategy']}/heat_{exp_input['strategy']}",
+        "-m", str(exp_input['n_cols']),
+        "-n", str(exp_input['n_rows']),
+        "-i", str(exp_input['max_iter']),
+        "-e", str(exp_input['threshold']),
+        "-c", f"{INPUT_FOLDER}/{exp_input['input_file']}",
+        "-t", f"{INPUT_FOLDER}/{exp_input['input_file']}",
+        "-k", str(exp_input['period']),
         "-L", "0",
         "-H", "100"
     ], text=True)
