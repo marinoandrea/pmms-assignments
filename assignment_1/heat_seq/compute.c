@@ -5,6 +5,9 @@
 #include <string.h>
 #include "compute.h"
 
+#pragma STDC FENV_ACCESS ON
+#pragma STDC FP_CONTRACT ON
+
 #define COEF_D 0.1035533905932737724
 #define COEF_S 0.1464466094067262691
 

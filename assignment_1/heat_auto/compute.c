@@ -8,8 +8,6 @@
 #pragma STDC FENV_ACCESS ON
 #pragma STDC FP_CONTRACT ON
 
-#pragma simd
-
 #define COEF_D 0.1035533905932737724
 #define COEF_S 0.1464466094067262691
 
@@ -83,8 +81,7 @@ void do_compute(const struct parameters *p, struct results *r)
             size_t idx_row_prev = idx_row - n_cols;
             size_t idx_row_next = idx_row + n_cols;
 
-#pragma ivdep
-#pragma vector always
+            #pragma omp simd
             for (size_t col = 0; col < n_cols; ++col)
             {
                 // the coef. matrix does not contain halo values

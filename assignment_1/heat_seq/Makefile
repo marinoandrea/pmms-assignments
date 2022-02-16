@@ -6,7 +6,7 @@ OBJ=$(patsubst %.c,%.o,$(SRC))
 CC=gcc
 INCLUDES=-I../../include
 ifndef DEBUG
-CFLAGS=-O2 -ffast-math -std=gnu99
+CFLAGS=-O3 -ffast-math -std=gnu99
 LIB=
 else
 CFLAGS=-O0 -g3 -std=gnu99
