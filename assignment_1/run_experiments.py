@@ -27,8 +27,8 @@ cc_flags = {
         '-O3 -mavx2 -mfma -ffast-math',
     ],
     'icc': [
-        '-O2 -mavx2 -mfma',
-        '-O3 -mavx2 -mfma',
+        '-O2 -march=core-avx2',
+        '-O3 -march=core-avx2',
     ]
 }
 
@@ -44,9 +44,11 @@ def main():
     for flags in cc_flags[compiler]:
         os.rename('heat_seq/Makefile', 'heat_seq/Makefile.backup')
         os.rename('heat_simd/Makefile', 'heat_simd/Makefile.backup')
+        os.rename('heat_auto/Makefile', 'heat_auto/Makefile.backup')
 
-        create_seq_makefile(compiler, flags)
-        create_simd_makefile(compiler, flags)
+        create_makefile(compiler, flags, 'heat_seq/Makefile')
+        create_makefile(compiler, flags, 'heat_simd/Makefile')
+        create_makefile(compiler, flags, 'heat_auto/Makefile')
 
         process_pool = mp.Pool()
         tasks = []
@@ -74,6 +76,7 @@ def main():
                             tasks.extend([
                                 {**params, 'strategy': 'seq'},
                                 {**params, 'strategy': 'simd'},
+                                {**params, 'strategy': 'auto'},
                             ])
 
             results.extend(process_pool.map(run_experiment, tasks))
@@ -83,9 +86,10 @@ def main():
         finally:
             os.rename('heat_seq/Makefile.backup', 'heat_seq/Makefile')
             os.rename('heat_simd/Makefile.backup', 'heat_simd/Makefile')
+            os.rename('heat_auto/Makefile.backup', 'heat_auto/Makefile')
             tasks.clear()
 
-    with open("PMMS_experiments.tsv", 'a') as f:
+    with open(f"PMMS_experiments_{compiler}.tsv", 'a') as f:
         f.write("idx\tinput_file\tstrategy\ttime\ttflops\ttmin\ttmax\ttdif\ttavg\tcompiler\tflags\tn_cols\tn_rows\tperiod\tmax_iter\tthreshold\n")
         for idx, result in enumerate(results):
             out = '\t'.join([
@@ -150,11 +154,13 @@ def parse_matrix_size(file_path):
 def run_build():
     subprocess.check_call(['make', 'clean'], cwd="./heat_seq")
     subprocess.check_call(['make', 'clean'], cwd="./heat_simd")
+    subprocess.check_call(['make', 'clean'], cwd="./heat_auto")
     subprocess.check_call(['make'], cwd="./heat_seq")
     subprocess.check_call(['make'], cwd="./heat_simd")
+    subprocess.check_call(['make'], cwd="./heat_auto")
 
 
-def create_seq_makefile(compiler, flags):
+def create_makefile(compiler, flags, path):
     makefile_string = f"""
 CURR_DIR=$(notdir $(basename $(shell pwd)))
 PRJ=$(CURR_DIR)
@@ -182,39 +188,7 @@ $(PRJ): $(OBJ)
 clean:
 \t-rm -f $(OBJ) $(PRJ)
     """
-    with open('heat_seq/Makefile', 'w') as f:
-        f.write(makefile_string)
-
-
-def create_simd_makefile(compiler, flags):
-    makefile_string = f"""
-CURR_DIR=$(notdir $(basename $(shell pwd)))
-PRJ=$(CURR_DIR)
-SRC=$(filter-out $(wildcard ref*.c), $(wildcard *.c))
-OBJ=$(patsubst %.c,%.o,$(SRC))
-
-CC={compiler}
-INCLUDES=-I../../include
-ifndef DEBUG
-CFLAGS={flags} -std=gnu99 -mavx2 -mfma
-LIB=
-else
-CFLAGS=-O0 -g3 -std=gnu99 -mavx2 -mfma
-LIB=
-endif
-
-all: $(PRJ)
-
-$(PRJ): $(OBJ)
-\t$(CC) $(CFLAGS) $(INCLUDES) $(OBJ) -o $@ -lm
-
-%.o: %.c
-\t$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@ $(LIB)
-
-clean:
-\t-rm -f $(OBJ) $(PRJ)
-    """
-    with open('heat_simd/Makefile', 'w') as f:
+    with open(path, 'w') as f:
         f.write(makefile_string)
 
 
