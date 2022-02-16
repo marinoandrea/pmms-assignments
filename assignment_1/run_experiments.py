@@ -3,7 +3,6 @@ import multiprocessing as mp
 import os
 import re
 import subprocess
-from dataclasses import asdict, dataclass
 
 DEBUG = True  # os.getenv('DEBUG') == 1
 
@@ -35,41 +34,9 @@ cc_flags = {
 }
 
 
-@dataclass
-class ExperimentInput:
-    compiler: str
-    flags: str
-    strategy: str
-    n_cols: int
-    n_rows: int
-    period: int
-    max_iter: int
-    threshold: float
-    input_file: str
-
-
-@dataclass
-class ExperimentResult:
-    tmax: float
-    tmin: float
-    tdif: float
-    tavg: float
-    time: float
-    tflops: float
-    compiler: str
-    flags: str
-    strategy: str
-    n_cols: int
-    n_rows: int
-    period: int
-    max_iter: int
-    threshold: float
-    input_file: str
-
-
 def main():
 
-    results: list[ExperimentResult] = []
+    results: list[dict] = []
 
     input_files = list(filter(lambda x: '.pgm' in x, os.listdir(INPUT_FOLDER)))
 
@@ -82,7 +49,7 @@ def main():
             create_simd_makefile(compiler, flags)
 
             process_pool = mp.Pool()
-            tasks: list[ExperimentInput] = []
+            tasks: list[dict] = []
 
             try:
                 run_build()
@@ -105,8 +72,8 @@ def main():
                                 }
 
                                 tasks.extend([
-                                    ExperimentInput(**params, strategy='seq'),
-                                    ExperimentInput(**params, strategy='simd'),
+                                    {**params, 'strategy': 'seq'},
+                                    {**params, 'strategy': 'simd'},
                                 ])
 
                 results.extend(process_pool.map(run_experiment, tasks))
@@ -123,26 +90,26 @@ def main():
         for idx, result in enumerate(results):
             out = '\t'.join([
                 str(idx),
-                result.input_file.split('/')[-1],
-                str(result.strategy),
-                str(result.time),
-                str(result.tflops),
-                str(result.tmin),
-                str(result.tmax),
-                str(result.tdif),
-                str(result.tavg),
-                str(result.compiler),
-                str(result.flags),
-                str(result.n_cols),
-                str(result.n_rows),
-                str(result.period),
-                str(result.max_iter),
-                str(result.threshold),
+                result['input_file'].split('/')[-1],
+                str(result['strategy']),
+                str(result['time']),
+                str(result['tflops']),
+                str(result['tmin']),
+                str(result['tmax']),
+                str(result['tdif']),
+                str(result['tavg']),
+                str(result['compiler']),
+                str(result['flags']),
+                str(result['n_cols']),
+                str(result['n_rows']),
+                str(result['period']),
+                str(result['max_iter']),
+                str(result['threshold']),
             ])
             f.write(f"{out}\n")
 
 
-def run_experiment(exp_input: ExperimentInput) -> ExperimentResult:
+def run_experiment(exp_input: dict) -> dict:
     output = subprocess.check_output([
         *CMD_PREFIX,
         f"./heat_{exp_input.strategy}/heat_{exp_input.strategy}",
@@ -162,15 +129,15 @@ def run_experiment(exp_input: ExperimentInput) -> ExperimentResult:
         map(lambda x: float(x),
             filter(lambda x: x != '', last_line.split(' '))))
 
-    return ExperimentResult(
-        **asdict(exp_input),
-        time=time,
-        tflops=tflops,
-        tmax=tmax,
-        tmin=tmin,
-        tdif=tdif,
-        tavg=tavg
-    )
+    return {
+        **exp_input,
+        time: time,
+        tflops: tflops,
+        tmax: tmax,
+        tmin: tmin,
+        tdif: tdif,
+        tavg: tavg
+    }
 
 
 def parse_matrix_size(file_path: str) -> tuple[int, int]:
