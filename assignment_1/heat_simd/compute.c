@@ -39,11 +39,11 @@ void do_compute(const struct parameters *p, struct results *r)
     // for the halo values.
     // NOTE: we create 2 heat matrices in order to have a front and back buffer
     // for computation that we swap at every iteration.
-    double *m_heat_a = (double *)_mm_malloc(sizeof(double) * (size_heat_row * (n_rows + 2)), 32);
-    double *m_heat_b = (double *)_mm_malloc(sizeof(double) * (size_heat_row * (n_rows + 2)), 32);
-    double *m_coef   = (double *)_mm_malloc(sizeof(double) * (size_coef_row * n_rows),       32);
+    double *m_heat_a = (double *)_mm_malloc(sizeof(double) * (size_heat_row * (n_rows + 2)), 4);
+    double *m_heat_b = (double *)_mm_malloc(sizeof(double) * (size_heat_row * (n_rows + 2)), 4);
+    double *m_coef   = (double *)_mm_malloc(sizeof(double) * (size_coef_row * n_rows),       4);
 
-    long long *m_mask  = (long long *)_mm_malloc(sizeof(long long) * (size_heat_row * (n_rows + 2)), 32);
+    long long *m_mask  = (long long *)_mm_malloc(sizeof(long long) * (size_heat_row * (n_rows + 2)), 4);
     
     // --- START: MATRICES INITIALIZATION ---
 
@@ -217,11 +217,7 @@ void do_compute(const struct parameters *p, struct results *r)
                 if (col4 < n_cols + 1) draw_point(col + 2, row - 1, next_heat_ptr[3]);
 #endif
             }      
-        }
 
-        // copycat columns
-        for (size_t row = 1; row < n_rows + 1; row++)
-        {
             m_heat_next[row * size_heat_row] = m_heat_next[row * size_heat_row + n_cols];
             m_heat_next[row * size_heat_row + n_cols + 1] = m_heat_next[row * size_heat_row + 1];
         }
