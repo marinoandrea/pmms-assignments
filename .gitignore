@@ -9,6 +9,7 @@
 assignment_1/**/*.pgm
 assignment_1/heat_seq/heat_seq
 assignment_1/heat_simd/heat_simd
+assignment_1/heat_auto/heat_auto
 
 # Jupyter checkpoints
 *-checkpoint.ipynb
