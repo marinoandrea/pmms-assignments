@@ -3,6 +3,7 @@ import multiprocessing as mp
 import os
 import re
 import subprocess
+import sys
 
 DEBUG = True  # os.getenv('DEBUG') == 1
 
@@ -29,64 +30,62 @@ cc_flags = {
         '-O2 -mavx2 -mfma',
         '-O3 -mavx2 -mfma',
     ]
-    # 'clang': [
-
-    # ],
 }
 
 
 def main():
 
+    compiler = sys.argv[1]
+
     results = []
 
     input_files = list(filter(lambda x: '.pgm' in x, os.listdir(INPUT_FOLDER)))
 
-    for compiler, flags_list in cc_flags.items():
-        for flags in flags_list:
-            os.rename('heat_seq/Makefile', 'heat_seq/Makefile.backup')
-            os.rename('heat_simd/Makefile', 'heat_simd/Makefile.backup')
+    for flags in cc_flags[compiler]:
+        os.rename('heat_seq/Makefile', 'heat_seq/Makefile.backup')
+        os.rename('heat_simd/Makefile', 'heat_simd/Makefile.backup')
 
-            create_seq_makefile(compiler, flags)
-            create_simd_makefile(compiler, flags)
+        create_seq_makefile(compiler, flags)
+        create_simd_makefile(compiler, flags)
 
-            process_pool = mp.Pool()
-            tasks = []
+        process_pool = mp.Pool()
+        tasks = []
 
-            try:
-                run_build()
+        try:
+            run_build()
 
-                for input_file in input_files:
-                    n_cols, n_rows = parse_matrix_size(input_file)
+            for input_file in input_files:
+                n_cols, n_rows = parse_matrix_size(input_file)
 
-                    for max_iter in MAX_ITERS:
-                        for threshold in THRESHOLDS:
-                            for period in PERIODS:
-                                params = {
-                                    "n_cols": n_cols,
-                                    "n_rows": n_rows,
-                                    "max_iter": max_iter,
-                                    "period": period,
-                                    "threshold": threshold,
-                                    "compiler": compiler,
-                                    "flags": flags,
-                                    "input_file": input_file,
-                                }
+                for max_iter in MAX_ITERS:
+                    for threshold in THRESHOLDS:
+                        for period in PERIODS:
+                            params = {
+                                "n_cols": n_cols,
+                                "n_rows": n_rows,
+                                "max_iter": max_iter,
+                                "period": period,
+                                "threshold": threshold,
+                                "compiler": compiler,
+                                "flags": flags,
+                                "input_file": input_file,
+                            }
 
-                                tasks.extend([
-                                    {**params, 'strategy': 'seq'},
-                                    {**params, 'strategy': 'simd'},
-                                ])
+                            tasks.extend([
+                                {**params, 'strategy': 'seq'},
+                                {**params, 'strategy': 'simd'},
+                            ])
 
-                results.extend(process_pool.map(run_experiment, tasks))
-                process_pool.close()
-                process_pool.join()
+            results.extend(process_pool.map(run_experiment, tasks))
+            process_pool.close()
+            process_pool.join()
 
-            finally:
-                os.rename('heat_seq/Makefile.backup', 'heat_seq/Makefile')
-                os.rename('heat_simd/Makefile.backup', 'heat_simd/Makefile')
-                tasks.clear()
+        finally:
+            os.rename('heat_seq/Makefile.backup', 'heat_seq/Makefile')
+            os.rename('heat_simd/Makefile.backup', 'heat_simd/Makefile')
+            tasks.clear()
 
-    with open("PMMS_experiments.tsv", 'w') as f:
+    with open("PMMS_experiments.tsv", 'a') as f:
         f.write("idx\tinput_file\tstrategy\ttime\ttflops\ttmin\ttmax\ttdif\ttavg\tcompiler\tflags\tn_cols\tn_rows\tperiod\tmax_iter\tthreshold\n")
         for idx, result in enumerate(results):
             out = '\t'.join([
