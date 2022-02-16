@@ -5,12 +5,15 @@
 #include <float.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "compute.h"
 
-#pragma STDC FP_CONTRACT ON 
+#pragma STDC FENV_ACCESS ON
+#pragma STDC FP_CONTRACT ON
 
 #define COEF_D 0.1035533905932737724
 #define COEF_S 0.1464466094067262691
+
 
 void do_compute(const struct parameters *p, struct results *r)
 {
@@ -22,9 +25,11 @@ void do_compute(const struct parameters *p, struct results *r)
     size_t printreports = p->printreports;
 
     size_t n_cpy_cols   = 2;
-    size_t n_pad_cols   = n_cols % 4 - 1;
-    size_t n_pad_cells  = (n_cols + n_pad_cols) * n_rows;
-    size_t n_tot_cells  = (n_cols + n_pad_cols + n_cpy_cols) * n_rows;
+    size_t n_utl_cols   = n_cols % 4 == 0 ? 1 : (floor(n_cols /  4) + 1) * 4 - n_cols;
+    size_t n_pad_cols   = n_utl_cols - 1;
+
+    size_t size_heat_row = n_cols + n_pad_cols + n_cpy_cols;
+    size_t size_coef_row = n_cols + n_utl_cols;
 
     __m256d coef_d = _mm256_set_pd(COEF_D, COEF_D, COEF_D, COEF_D);
     __m256d coef_s = _mm256_set_pd(COEF_S, COEF_S, COEF_S, COEF_S);
@@ -34,103 +39,62 @@ void do_compute(const struct parameters *p, struct results *r)
     // for the halo values.
     // NOTE: we create 2 heat matrices in order to have a front and back buffer
     // for computation that we swap at every iteration.
-    double *m_heat_a = (double *)_mm_malloc(sizeof(double) * (n_tot_cells + 2 * (n_cols + n_pad_cols + n_cpy_cols)), 32);
-    double *m_heat_b = (double *)_mm_malloc(sizeof(double) * (n_tot_cells + 2 * (n_cols + n_pad_cols + n_cpy_cols)), 32);
-    double *m_coef   = (double *)_mm_malloc(sizeof(double) * (n_pad_cells),                                          32);
+    double *m_heat_a = (double *)_mm_malloc(sizeof(double) * (size_heat_row * (n_rows + 2)), 32);
+    double *m_heat_b = (double *)_mm_malloc(sizeof(double) * (size_heat_row * (n_rows + 2)), 32);
+    double *m_coef   = (double *)_mm_malloc(sizeof(double) * (size_coef_row * n_rows),       32);
 
-    /*
-    NOTE:
-    Our matrices now have padding on the right side and copycat columns. 
-    Therefore, we cannot use memcpy in the same way we did for the 
-    sequential implementation.
+    long long *m_mask  = (long long *)_mm_malloc(sizeof(long long) * (size_heat_row * (n_rows + 2)), 32);
+    
+    // --- START: MATRICES INITIALIZATION ---
 
-    c   x x x x x   c   p p
-    -----------------------
-    1 | 1 0 0 0 0 | 0 | 0 0
-    0 | 0 1 0 0 0 | 0 | 0 0
+    // top halo
+    memcpy(m_heat_a + 1, p->tinit, sizeof(double) * n_cols);
 
-    0 | 0 0 0 | 0
-    0 | 0 0 0 | 0
-    1 | 1 0 1 | 1
-
-    h1h1h2h...hNpp
-    x1x1x2x...xNpp
-    x1x1x2x...xNpp
-    h1h1h2h...hNpp
-
-    where h = halo, x = value, p = padding (zero init), c = copycat.
-    */    
-    for (size_t row = 0; row < n_rows + 2; row++)
+    // actual matrix
+    for (size_t row = 1; row < n_rows + 2; row++)
     {
-        size_t idx_row      = row * n_cols;
-        size_t idx_pad_row  = row * (n_cols + n_pad_cols);
-        size_t idx_row_prev = idx_row - n_cols;
-
-        for (size_t col = 0; col < n_cols + 2; col++)
-        {
-            // top halo
-            if (row == 0)
-            {
-                if (col == 0)
-                {
-                    m_heat_a[idx_pad_row] = p->tinit[idx_row];
-                }
-                else if (col == n_cols + n_cpy_cols - 1)
-                {
-                    m_heat_a[idx_pad_row + col] = p->tinit[idx_row + col - 2];
-                }
-                else
-                {
-                    m_heat_a[idx_pad_row + col] = p->tinit[idx_row + col - 1];
-                }
-            } 
-            // bottom halo
-            else if (row == n_rows + 1)
-            {
-                if (col == 0)
-                {
-                    m_heat_a[idx_pad_row] = p->tinit[(n_rows - 1) * n_cols];
-                }
-                else if (col == n_cols + n_cpy_cols - 1)
-                {
-                    m_heat_a[idx_pad_row + col] = p->tinit[(n_rows - 1) * n_cols + col - 2];
-                }
-                else
-                {
-                    m_heat_a[idx_pad_row + col] = p->tinit[(n_rows - 1) * n_cols + col - 1];
-                }
-            }
-            // actual matrix
-            else 
-            {
-                if (col == 0)
-                {
-                    m_heat_a[idx_pad_row] = p->tinit[idx_row_prev];
-                }
-                else if (col == n_cols + n_cpy_cols - 1)
-                {
-                    m_heat_a[idx_pad_row + col] = p->tinit[idx_row_prev + col - 2];
-                }
-                else
-                {
-                    m_heat_a[idx_pad_row + col] = p->tinit[idx_row_prev + col - 1];
-                }
-            }
-        }
+        memcpy(m_heat_a + row * size_heat_row + 1, p->tinit + (row - 1) * n_cols, sizeof(double) * n_cols);
     }
 
-    memcpy(m_heat_b, m_heat_a, sizeof(double) * (n_tot_cells + + 2 * (n_cols + n_pad_cols + n_cpy_cols)));
+    // bottom halo
+    memcpy(m_heat_a + size_heat_row * (n_rows + 1) + 1, p->tinit + (n_rows - 1) * n_cols, sizeof(double) * n_cols);
+
+    // copycat columns
+    for (size_t row = 0; row < n_rows + 2; row++)
+    {
+        m_heat_a[row * size_heat_row] = m_heat_a[row * size_heat_row + n_cols];
+        m_heat_a[row * size_heat_row + n_cols + 1] = m_heat_a[row * size_heat_row + 1];
+    }
+
+    memcpy(m_heat_b, m_heat_a, sizeof(double) * (size_heat_row * (n_rows + 2)));
 
     for (size_t row = 0; row < n_rows; row++)
     {
-        size_t idx_row     = row * n_cols;
-        size_t idx_pad_row = row * (n_cols + n_pad_cols);
+        size_t idx_init_row = row * n_cols;
+        size_t idx_coef_row = row * size_coef_row;
 
         for (size_t col = 0; col < n_cols; col ++)
         {
-            m_coef[idx_pad_row + col] = p->conductivity[idx_row + col];
+            m_coef[idx_coef_row + col] = p->conductivity[idx_init_row + col];
         }
     }
+
+    // initialize store masks
+    for (size_t row = 0; row < n_rows + 2; row++)
+    {
+        size_t idx_row = row * size_heat_row;
+
+        for (size_t col = 0; col < size_heat_row; col++)
+        {
+            // prevent storage on utility rows
+            if ((row == 0 || row == n_rows + 1) || (col == 0) || (size_heat_row - col < n_cpy_cols + n_pad_cols))
+                m_mask[idx_row + col] = 0;
+            else 
+                m_mask[idx_row + col] = -1;
+        }
+    }
+
+    // --- END: MATRICES INITIALIZATION ---
 
     // iteration number
     size_t i = 1;
@@ -164,9 +128,10 @@ void do_compute(const struct parameters *p, struct results *r)
 
         for (size_t row = 1; row < n_rows + 1; ++row)
         {
-            size_t idx_row      = row * (n_cols + n_pad_cols);
-            size_t idx_row_prev = idx_row - (n_cols + n_pad_cols);
-            size_t idx_row_next = idx_row + (n_cols + n_pad_cols);
+            size_t idx_row      = row * size_heat_row;
+            size_t idx_row_prev = idx_row - size_heat_row;
+            size_t idx_row_next = idx_row + size_heat_row;
+            size_t idx_row_coef = (row - 1) * size_coef_row;
 
             for (size_t col = 1; col < n_cols + 1; col += 4)
             {
@@ -175,22 +140,25 @@ void do_compute(const struct parameters *p, struct results *r)
 
                 // loading AVX data structures
                 // simple neighbors
-                __m256d neighbors_t  = _mm256_load_pd(&m_heat_prev[idx_row_prev + col]);
-                __m256d neighbors_b  = _mm256_load_pd(&m_heat_prev[idx_row_next + col]);
-                __m256d neighbors_l  = _mm256_load_pd(&m_heat_prev[idx_row + col_prev]);
-                __m256d neighbors_r  = _mm256_load_pd(&m_heat_prev[idx_row + col_next]);
+                __m256d neighbors_t  = _mm256_loadu_pd(&m_heat_prev[idx_row_prev + col]);
+                __m256d neighbors_b  = _mm256_loadu_pd(&m_heat_prev[idx_row_next + col]);
+                __m256d neighbors_l  = _mm256_loadu_pd(&m_heat_prev[idx_row + col_prev]);
+                __m256d neighbors_r  = _mm256_loadu_pd(&m_heat_prev[idx_row + col_next]);
                 // diagonal neighbors
-                __m256d neighbors_tl = _mm256_load_pd(&m_heat_prev[idx_row_prev + col_prev]);
-                __m256d neighbors_tr = _mm256_load_pd(&m_heat_prev[idx_row_prev + col_next]);
-                __m256d neighbors_br = _mm256_load_pd(&m_heat_prev[idx_row_next + col_next]);
-                __m256d neighbors_bl = _mm256_load_pd(&m_heat_prev[idx_row_next + col_prev]);
+                __m256d neighbors_tl = _mm256_loadu_pd(&m_heat_prev[idx_row_prev + col_prev]);
+                __m256d neighbors_tr = _mm256_loadu_pd(&m_heat_prev[idx_row_prev + col_next]);
+                __m256d neighbors_br = _mm256_loadu_pd(&m_heat_prev[idx_row_next + col_next]);
+                __m256d neighbors_bl = _mm256_loadu_pd(&m_heat_prev[idx_row_next + col_prev]);
 
                 // previous temperatures
-                __m256d prev_heat = _mm256_load_pd(&m_heat_prev[idx_row + col]);
+                __m256d prev_heat = _mm256_loadu_pd(&m_heat_prev[idx_row + col]);
 
                 // coefficients (this matrix does not have copycat columns)
-                __m256d coefs   = _mm256_load_pd(&m_coef[idx_row_prev + col_prev]);                
+                __m256d coefs   = _mm256_loadu_pd(&m_coef[idx_row_coef + col_prev]);                
                 __m256d coefs_r = _mm256_sub_pd(ones, coefs);
+
+                // store bitmask
+                __m256i store_mask = _mm256_loadu_si256((__m256i *)&m_mask[idx_row + col]);
 
                 // simulation logic
                 __m256d sum_neighbors_tb = _mm256_add_pd(neighbors_t, neighbors_b);
@@ -204,27 +172,12 @@ void do_compute(const struct parameters *p, struct results *r)
                 __m256d sum_neighbors = _mm256_fmadd_pd(sum_s, coef_s,    _mm256_mul_pd(sum_d, coef_d));                
                 __m256d next_heat     = _mm256_fmadd_pd(coefs, prev_heat, _mm256_mul_pd(coefs_r, sum_neighbors));
 
-                double *next_heat_ptr = (double *)&next_heat;
+                _mm256_maskstore_pd(&m_heat_next[idx_row + col], store_mask, next_heat);
 
+                double *next_heat_ptr = (double *)&next_heat;                    
                 size_t col2 = col + 1;
                 size_t col3 = col + 2;
                 size_t col4 = col + 3;
-
-                // update next temperature value
-                m_heat_next[idx_row + col] = next_heat_ptr[0];
-                if (col2 < n_cols + 1) m_heat_next[idx_row + col + 1] = next_heat_ptr[1];
-                if (col3 < n_cols + 1) m_heat_next[idx_row + col + 2] = next_heat_ptr[2];
-                if (col4 < n_cols + 1) m_heat_next[idx_row + col + 3] = next_heat_ptr[3];
-
-                // update duplicate boundaries
-                if (col == 1)
-                {
-                    m_heat_next[idx_row + n_cols + 1] = next_heat_ptr[0];
-                }
-                else if (col == n_cols)
-                { 
-                    m_heat_next[idx_row] = next_heat_ptr[0];
-                }
 
                 if (i % n_report == 0 || i == n_iters)
                 {
@@ -258,12 +211,19 @@ void do_compute(const struct parameters *p, struct results *r)
                 }
 
 #ifdef DRAW_PGM
-                draw_point(col, row - 1, next_heat_ptr[0]);
-                draw_point(col, row - 1, next_heat_ptr[1]);
-                draw_point(col, row - 1, next_heat_ptr[2]);
-                draw_point(col, row - 1, next_heat_ptr[3]);
+                draw_point(col - 1, row - 1, next_heat_ptr[0]);
+                if (col2 < n_cols + 1) draw_point(col,     row - 1, next_heat_ptr[1]);
+                if (col3 < n_cols + 1) draw_point(col + 1, row - 1, next_heat_ptr[2]);
+                if (col4 < n_cols + 1) draw_point(col + 2, row - 1, next_heat_ptr[3]);
 #endif
-            }
+            }      
+        }
+
+        // copycat columns
+        for (size_t row = 1; row < n_rows + 1; row++)
+        {
+            m_heat_next[row * size_heat_row] = m_heat_next[row * size_heat_row + n_cols];
+            m_heat_next[row * size_heat_row + n_cols + 1] = m_heat_next[row * size_heat_row + 1];
         }
         
         if (i % n_report == 0 || i == n_iters) 
@@ -285,6 +245,7 @@ void do_compute(const struct parameters *p, struct results *r)
     }
 
     _mm_free(m_coef);
+    _mm_free(m_mask);
     _mm_free(m_heat_a);
     _mm_free(m_heat_b);
 }
