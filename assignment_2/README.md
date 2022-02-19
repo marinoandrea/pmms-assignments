@@ -46,9 +46,9 @@ We will compare your implementations speed. The speed will not impact your grade
 
 ## Todo
 
-1. [] Assignment 2.1: Parallelisation of heat dissipation code with OpenMP
-2. [] Assignment 2.2: Experimentation with OpenMP heat dissipation code
-3. [] Assignment 2.3: Task parallelism
-4. [] Assignment 2.4: Experimentation with task parallelism
-5. [] Assignment 2.5: Combining loop and task parallelism
-6. [] Report
+1. [ ] Assignment 2.1: Parallelisation of heat dissipation code with OpenMP
+2. [ ] Assignment 2.2: Experimentation with OpenMP heat dissipation code
+3. [ ] Assignment 2.3: Task parallelism
+4. [ ] Assignment 2.4: Experimentation with task parallelism
+5. [ ] Assignment 2.5: Combining loop and task parallelism
+6. [ ] Report
