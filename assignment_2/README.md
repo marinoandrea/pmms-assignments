@@ -43,6 +43,7 @@ We will compare your implementations speed. The speed will not impact your grade
 ## Links
 - [Assignment description on Canvas](https://canvas.uva.nl/courses/28739/files/folder/Assignments?preview=6240528)
 - [Project description on Canvas](https://canvas.uva.nl/courses/28739/files/folder/Assignments?preview=6182439)
+- [DAS 5 cheat-sheet](./DAS5_cheatsheet.md)
 
 ## Todo
 

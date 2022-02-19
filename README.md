@@ -64,22 +64,19 @@ Speed measurements:
 Speed measurements: 
 `./heat_seq -n 1000 -m 1000 -i 10000 -e 0.0001 -c ../../images/pat1_1000x1000.pgm -t ../../images/pat1_1000x1000.pgm -k 70 -L 0 -H 100 -p 16`
 
-
 ### Measuring time 
 You'll have to measure time. If not predefined in the file please use clock_gettime(CLOCK_MONOTONIC ...) to measure the time. For explanation see here: 
 - https://www.cs.rutgers.edu/~pxk/416/notes/c-tutorials/gettime.html
 - https://linux.die.net/man/3/clock_gettime
 - https://blog.habets.se/2010/09/gettimeofday-should-never-be-used-to-measure-time.html
 
-# Assignment 2 - [Mergesort and Vecsort](https://bitbucket.org/uva-sne/pmms-heat-diffusion/src/master/assignment_2/README.md)
+# Assignment 2 - [Mergesort and Vecsort](./assignment_2/README.md)
 
+# Assignment 3 - [Histogram and Pipesort](./assignment_2/README.md)
 
-# Assignment 3 - [Histogram and Pipesort](https://bitbucket.org/uva-sne/pmms-heat-diffusion/src/master/assignment_3/README.md)
+# Assignment 4 - [Convolution and Histogram](./assignment_2/README.md)
 
-
-# Assignment 4 - [Convolution and Histogram](https://bitbucket.org/uva-sne/pmms-heat-diffusion/src/master/assignment_4/README.md)
-
-# DAS 5 Information - [Cheat-sheet](https://bitbucket.org/uva-sne/pmms-heat-diffusion/src/master/DAS5_cheatsheet.md)
+# DAS 5 Information - [Cheat-sheet](./DAS5_cheatsheet.md)
 
 
 
