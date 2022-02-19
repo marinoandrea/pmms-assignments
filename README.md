@@ -70,11 +70,11 @@ You'll have to measure time. If not predefined in the file please use clock_gett
 - https://linux.die.net/man/3/clock_gettime
 - https://blog.habets.se/2010/09/gettimeofday-should-never-be-used-to-measure-time.html
 
-# Assignment 2 - [Mergesort and Vecsort](./assignment_2/README.md)
+# Assignment 2 - [Mergesort and Vecsort](./assignment_2)
 
-# Assignment 3 - [Histogram and Pipesort](./assignment_2/README.md)
+# Assignment 3 - [Histogram and Pipesort](./assignment_3)
 
-# Assignment 4 - [Convolution and Histogram](./assignment_2/README.md)
+# Assignment 4 - [Convolution and Histogram](./assignment_4)
 
 # DAS 5 Information - [Cheat-sheet](./DAS5_cheatsheet.md)
 
