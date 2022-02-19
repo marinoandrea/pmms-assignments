@@ -1,5 +1,8 @@
 # Assignment 2 - Mergesort and Vecsort
-- You will probably implement multiple versions of mergesort and vecort. At least one sequential and one parallel version. 
+
+_Submission due date: **Tuesday, March 1, 2022**_
+
+- You will probably implement multiple versions of mergesort and vecsort. At least one sequential and one parallel version. 
 - Please make sure that each version is in its own subdirectory for the right sub-assignment (i.e. if you have a parallel implementation of mergesort called "parallel_a" it should be in: **assignment_2/mergesort/parallel_a/**).
 - The executable needs to have the same name as the version folder name, i.e. for the parallel mergesort version please make sure the executable is called "parallel_a".
 - Make a new subfolder for each version you want to try. All versions should be based on the same boilerplate code.  
@@ -37,3 +40,15 @@ For the speed we will use the *-p* flag to set the number of threads for the tes
 So make sure that it is used to set the number of threads!
 We will compare your implementations speed. The speed will not impact your grades!
 
+## Links
+- [Assignment description on Canvas](https://canvas.uva.nl/courses/28739/files/folder/Assignments?preview=6240528)
+- [Project description on Canvas](https://canvas.uva.nl/courses/28739/files/folder/Assignments?preview=6182439)
+
+## Todo
+
+1. [] Assignment 2.1: Parallelisation of heat dissipation code with OpenMP
+2. [] Assignment 2.2: Experimentation with OpenMP heat dissipation code
+3. [] Assignment 2.3: Task parallelism
+4. [] Assignment 2.4: Experimentation with task parallelism
+5. [] Assignment 2.5: Combining loop and task parallelism
+6. [] Report
