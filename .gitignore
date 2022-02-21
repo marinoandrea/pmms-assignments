@@ -11,6 +11,9 @@ assignment_1/heat_seq/heat_seq
 assignment_1/heat_simd/heat_simd
 assignment_1/heat_auto/heat_auto
 
+assignment_2/heat_omp/heat_omp
+
+
 # Jupyter checkpoints
 *-checkpoint.ipynb
 
