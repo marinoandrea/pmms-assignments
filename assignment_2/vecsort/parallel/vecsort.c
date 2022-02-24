@@ -12,8 +12,51 @@ typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
 int debug = 0;
 
-void vecsort(/* ...  */){
-    //TODO: Just Do It. Don't let your dreams be dreams.
+void Merge(int *a, long begin, long mid, long end, int *b)
+{
+    long i = begin, j = mid;
+    
+    for(long k = begin; k < end; k++)
+    {
+        if(i < mid && (j >= end || a[i] <= a[j]))
+        {
+            b[k] = a[i];
+            i++;
+        }
+        else
+        {
+            b[k] = a[j];
+            j++;
+        }
+    }
+}
+
+void Split(int *b, long begin, long end, int *a)
+{
+    if(end - begin < 2)
+        return;
+    
+    long mid = (begin + end) / 2;
+    Split(a, begin, mid, b);
+    Split(a, mid, end, b);
+
+    Merge(b, begin, mid, end, a);
+}
+
+
+/* Sort vector v of l elements using mergesort */
+void msort(int *v, long l) {
+    int *v_copy = (int*)malloc(l*sizeof(int));
+    memcpy(v_copy, v, l*sizeof(int));
+    
+    Split(v_copy, 0, l, v);
+}
+
+//TODO: Just Do It. Don't let your dreams be dreams.
+void vecsort(int * vectors[], int lengths[], long length_outer){
+    for (long i = 0; i < length_outer; ++i) {
+        msort(vectors[i], lengths[i]);
+    }
 }
 
 void print_v(int **vector_vectors, int *vector_lengths, long length_outer) {
@@ -136,13 +179,13 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &before);
 
     /* Sort */
-    vecsort(/* ... */);
+    vecsort(vector_vectors, vector_lengths, length_outer);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
               (double)(after.tv_nsec - before.tv_nsec) / 1e9;
 
-    printf("Vecsort took: % .6e seconds \n", time);
+    printf("Vecsort took: % .6e \n", time);
 
     if(debug) {
         print_v(vector_vectors, vector_lengths, length_outer);
