@@ -12,8 +12,12 @@ _Submission due date: **Tuesday, March 1, 2022**_
 1. [ ] Assignment 2.1: Parallelisation of heat dissipation code with OpenMP
 2. [ ] Assignment 2.2: Experimentation with OpenMP heat dissipation code
 3. [ ] Assignment 2.3: Task parallelism
+   1. [ ] Sequential merge sort
+   2. [ ] Parallel merge sort
 4. [ ] Assignment 2.4: Experimentation with task parallelism
 5. [ ] Assignment 2.5: Combining loop and task parallelism
+   1. [ ] Sequential vector sort
+   2. [ ] Parallel vector sort
 6. [ ] Report
 
 ## Assignment details
