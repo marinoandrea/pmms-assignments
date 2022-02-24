@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <omp.h>
 #include <assert.h>
+#include <string.h>
 
 /* Ordering of the vector */
 typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
