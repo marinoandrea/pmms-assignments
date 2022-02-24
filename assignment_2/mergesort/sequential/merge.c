@@ -11,10 +11,49 @@ typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
 int debug = 0;
 
-/* Sort vector v of l elements using mergesort */
-void msort(int *v, long l){
 
+void Merge(int *a, long begin, long mid, long end, int *b)
+{
+    long i = begin, j = mid;
+    
+    for(long k = begin; k < end; k++)
+    {
+        if(i < mid && (j >= end || a[i] <= a[j]))
+        {
+            b[k] = a[i];
+            i++;
+        }
+        else
+        {
+            b[k] = a[j];
+            j++;
+        }
+    }
 }
+
+void Split(int *b, long begin, long end, int *a)
+{
+    if(end - begin < 2)
+        return;
+    
+    long mid = (begin + end) / 2;
+    Split(a, begin, mid, b);
+    Split(a, mid, end, b);
+
+    Merge(b, begin, mid, end, a);
+}
+
+
+/* Sort vector v of l elements using mergesort */
+void msort(int *v, long l) {
+    int *v_copy = (int*)malloc(l*sizeof(int));
+    memcpy(v_copy, v, l*sizeof(int));
+    
+    Split(v_copy, 0, l, v);
+    print_v(v, l);
+}
+
+
 
 void print_v(int *v, long l) {
     printf("\n");
