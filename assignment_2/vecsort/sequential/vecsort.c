@@ -12,8 +12,11 @@ typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
 int debug = 0;
 
-void vecsort(/* ...  */){
-    //TODO: Just Do It. Don't let your dreams be dreams.
+//TODO: Just Do It. Don't let your dreams be dreams.
+void vecsort(int vectors[], int lengths[], long length_outer){
+    for (long i = 0; i < length_outer; ++i) {
+        msort(vectors[i], lengths[i]);
+    }
 }
 
 void print_v(int **vector_vectors, int *vector_lengths, long length_outer) {
@@ -136,7 +139,7 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &before);
 
     /* Sort */
-    vecsort(/* ... */);
+    vecsort(vector_vectors, vector_lengths, length_outer);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
