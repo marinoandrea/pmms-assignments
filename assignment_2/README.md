@@ -18,6 +18,9 @@ _Submission due date: **Tuesday, March 1, 2022**_
 5. [ ] Assignment 2.5: Combining loop and task parallelism
    1. [x] Sequential vector sort
    2. [x] Parallel vector sort
+   3. [x] Experiment with OpenMP to find optimal scheduling etc.
+   4. [ ] Combine with task-parallel merge sort
+   5. [ ] Run different versions of vecsort to generate experimental results
 6. [ ] Report
 
 ## Assignment details
