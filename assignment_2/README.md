@@ -17,7 +17,7 @@ _Submission due date: **Tuesday, March 1, 2022**_
 4. [ ] Assignment 2.4: Experimentation with task parallelism
 5. [ ] Assignment 2.5: Combining loop and task parallelism
    1. [x] Sequential vector sort
-   2. [ ] Parallel vector sort
+   2. [x] Parallel vector sort
 6. [ ] Report
 
 ## Assignment details
