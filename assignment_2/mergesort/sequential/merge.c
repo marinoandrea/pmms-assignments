@@ -5,14 +5,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <omp.h>
-
-/* Ordering of the vector */
-typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
+#include "input.h"
 
 int debug = 0;
 
-
-void Merge(int *a, long begin, long mid, long end, int *b)
+void merge(int *a, long begin, long mid, long end, int *b)
 {
     long i = begin, j = mid;
     
@@ -31,138 +28,96 @@ void Merge(int *a, long begin, long mid, long end, int *b)
     }
 }
 
-void Split(int *b, long begin, long end, int *a)
+void split(int *b, long begin, long end, int *a)
 {
     if(end - begin < 2)
         return;
     
     long mid = (begin + end) / 2;
-    Split(a, begin, mid, b);
-    Split(a, mid, end, b);
+    split(a, begin, mid, b);
+    split(a, mid, end, b);
 
-    Merge(b, begin, mid, end, a);
+    merge(b, begin, mid, end, a);
 }
 
 
 /* Sort vector v of l elements using mergesort */
-void msort(int *v, long l) {
+void msort(int *v, long l) 
+{
     int *v_copy = (int*)malloc(l*sizeof(int));
     memcpy(v_copy, v, l*sizeof(int));
     
-    Split(v_copy, 0, l, v);
+    split(v_copy, 0, l, v);
     print_v(v, l);
 }
 
 
-
-void print_v(int *v, long l) {
+void print_v(int *v, long l) 
+{
     printf("\n");
-    for(long i = 0; i < l; i++) {
-        if(i != 0 && (i % 10 == 0)) {
-            printf("\n");
-        }
+    for(long i = 0; i < l; i++) 
+    {
+        if(i != 0 && (i % 10 == 0)) printf("\n");
         printf("%d ", v[i]);
     }
     printf("\n");
 }
 
-int main(int argc, char **argv) {
-
-    int c;
-    int seed = 42;
-    long length = 1e4;
-    int num_threads = 1;
-    Order order = ASCENDING;
-    int *vector;
+int main(int argc, char **argv) 
+{
+    params cli_params = { 0 };
+    if (parse_arguments(argc, argv, &cli_params) != 0)
+    {
+        return -1;
+    }
 
     struct timespec before, after;
 
-    /* Read command-line options. */
-    while((c = getopt(argc, argv, "adrgp:l:s:")) != -1) {
-        switch(c) {
-            case 'a':
-                order = ASCENDING;
-                break;
-            case 'd':
-                order = DESCENDING;
-                break;
-            case 'r':
-                order = RANDOM;
-                break;
-            case 'l':
-                length = atol(optarg);
-                break;
-            case 'g':
-                debug = 1;
-                break;
-            case 's':
-                seed = atoi(optarg);
-                break;
-            case 'p':
-                num_threads = atoi(optarg);
-                break;
-            case '?':
-                if(optopt == 'l' || optopt == 's') {
-                    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-                }
-                else if(isprint(optopt)) {
-                    fprintf(stderr, "Unknown option '-%c'.\n", optopt);
-                }
-                else {
-                    fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
-                }
-                return -1;
-            default:
-                return -1;
-        }
-    }
-
     /* Seed such that we can always reproduce the same random vector */
-    srand(seed);
+    srand(cli_params.seed);
 
     /* Allocate vector. */
-    vector = (int*)malloc(length*sizeof(int));
-    if(vector == NULL) {
+    int *vector = (int *)calloc(cli_params.length, sizeof(int));
+
+    if(vector == NULL) 
+    {
         fprintf(stderr, "Malloc failed...\n");
         return -1;
     }
 
     /* Fill vector. */
-    switch(order){
+    switch(cli_params.order)
+    {
         case ASCENDING:
-            for(long i = 0; i < length; i++) {
-                vector[i] = (int)i;
-            }
+            for(long i = 0; i < cli_params.length; i++) vector[i] = (int)i;
             break;
         case DESCENDING:
-            for(long i = 0; i < length; i++) {
-                vector[i] = (int)(length - i);
-            }
+            for(long i = 0; i < cli_params.length; i++) vector[i] = (int)(cli_params.length - i);
             break;
         case RANDOM:
-            for(long i = 0; i < length; i++) {
-                vector[i] = rand();
-            }
+            for(long i = 0; i < cli_params.length; i++) vector[i] = rand();
             break;
     }
 
-    if(debug) {
-        print_v(vector, length);
+    if(cli_params.debug) 
+    {
+        print_v(vector, cli_params.length);
     }
 
     clock_gettime(CLOCK_MONOTONIC, &before);
 
-    /* Sort */
-    msort(vector, length);
+    msort(vector, cli_params.length);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
+
     double time = (double)(after.tv_sec - before.tv_sec) +
                   (double)(after.tv_nsec - before.tv_nsec) / 1e9;
 
-    printf("Mergesort took: % .6e seconds \n", time);
+    printf("mergesort took: % .6e seconds \n", time);
 
-    if(debug) {
-        print_v(vector, length);
+    if(cli_params.debug) 
+    {
+        print_v(vector, cli_params.length);
     }
 
     return 0;
