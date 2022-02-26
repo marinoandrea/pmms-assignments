@@ -76,7 +76,6 @@ void do_compute(const struct parameters *p, struct results *r)
         begin_picture(i, n_cols, n_rows, p->io_tmin, p->io_tmax);
 #endif
         size_t row;
-        size_t col;
 
         #pragma omp parallel for private(row)
         for (row = 1; row < n_rows + 1; ++row)
@@ -84,6 +83,8 @@ void do_compute(const struct parameters *p, struct results *r)
             size_t idx_row      = row * n_cols;
             size_t idx_row_prev = idx_row - n_cols;
             size_t idx_row_next = idx_row + n_cols;
+
+            size_t col;
 
             for (col = 0; col < n_cols; ++col)
             {
