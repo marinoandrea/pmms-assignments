@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <omp.h>
+#include <string.h>
 #include "input.h"
 
 int debug = 0;
@@ -40,6 +41,16 @@ void split(int *b, long begin, long end, int *a)
     merge(b, begin, mid, end, a);
 }
 
+void print_v(int *v, long l) 
+{
+    printf("\n");
+    for(long i = 0; i < l; i++) 
+    {
+        if(i != 0 && (i % 10 == 0)) printf("\n");
+        printf("%d ", v[i]);
+    }
+    printf("\n");
+}
 
 /* Sort vector v of l elements using mergesort */
 void msort(int *v, long l) 
@@ -52,16 +63,6 @@ void msort(int *v, long l)
 }
 
 
-void print_v(int *v, long l) 
-{
-    printf("\n");
-    for(long i = 0; i < l; i++) 
-    {
-        if(i != 0 && (i % 10 == 0)) printf("\n");
-        printf("%d ", v[i]);
-    }
-    printf("\n");
-}
 
 int main(int argc, char **argv) 
 {
@@ -113,7 +114,7 @@ int main(int argc, char **argv)
     double time = (double)(after.tv_sec - before.tv_sec) +
                   (double)(after.tv_nsec - before.tv_nsec) / 1e9;
 
-    printf("mergesort took: % .6e seconds \n", time);
+    printf("sequential mergesort took: % .6e seconds \n", time);
 
     if(cli_params.debug) 
     {

@@ -4,9 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include <string.h>
 #include "input.h"
 
 int SEQUENTIAL_CUTOFF = 100;
+
+int compare(const void *a, const void *b)
+{   
+    return (* (int *)a) - (* (int *)b);
+}
 
 void merge(int *a, long begin, long mid, long end, int *b)
 {
@@ -27,15 +33,6 @@ void merge(int *a, long begin, long mid, long end, int *b)
     }
 }
 
-inline int compare(const void *a, const void *b)
-{   
-    int value_a = *(int *)a;
-    int value_b = *(int *)b;
-    if (value_a > value_b) return 1;
-    if (value_a < value_b) return -1;
-    return 0; 
-}
-
 inline void split(int *b, long begin, long end, int *a) 
 {
     if(end - begin < SEQUENTIAL_CUTOFF) 
@@ -45,28 +42,17 @@ inline void split(int *b, long begin, long end, int *a)
     }
     
     long mid = (begin + end) / 2;
-
-    #pragma omp parallel task nowait
+    
+    #pragma omp task shared(a, b) firstprivate(begin, mid)
     split(a, begin, mid, b);
 
+    #pragma omp task shared(a, b) firstprivate(mid, end)
     split(a, mid, end, b);
 
-    #pragma omp parallel barrier
+    #pragma omp taskwait
 
     merge(b, begin, mid, end, a);
 }
-
-
-/* Sort vector v of l elements using mergesort */
-void msort(int *v, long l) {
-    int *v_copy = (int*)malloc(l*sizeof(int));
-    memcpy(v_copy, v, l*sizeof(int));
-    
-    split(v_copy, 0, l, v);
-    print_v(v, l);
-}
-
-
 
 void print_v(int *v, long l) {
     printf("\n");
@@ -76,6 +62,15 @@ void print_v(int *v, long l) {
         printf("%d ", v[i]);
     }
     printf("\n");
+}
+
+/* Sort vector v of l elements using mergesort */
+void msort(int *v, long l) {
+    int *v_copy = (int*)malloc(l*sizeof(int));
+    memcpy(v_copy, v, l*sizeof(int));
+    
+    split(v_copy, 0, l, v);
+    print_v(v, l);
 }
 
 int main(int argc, char **argv) 
@@ -123,7 +118,7 @@ int main(int argc, char **argv)
 
     #pragma omp parallel
     {
-        #pragma omp parallel single
+        #pragma omp single
         msort(vector, cli_params.length);
     }
 
@@ -131,7 +126,7 @@ int main(int argc, char **argv)
     double time = (double)(after.tv_sec - before.tv_sec) +
                   (double)(after.tv_nsec - before.tv_nsec) / 1e9;
 
-    printf("mergesort took: % .6e seconds \n", time);
+    printf("parallel mergesort took: % .6e seconds \n", time);
 
     if(cli_params.debug) 
     {
