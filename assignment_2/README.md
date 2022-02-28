@@ -9,19 +9,34 @@ _Submission due date: **Tuesday, March 1, 2022**_
 
 ## Todo list
 
-1. [ ] Assignment 2.1: Parallelisation of heat dissipation code with OpenMP
+1. [x] Assignment 2.1: Parallelisation of heat dissipation code with OpenMP
 2. [ ] Assignment 2.2: Experimentation with OpenMP heat dissipation code
+   - [ ] Generate experimental results
+   - [ ] Make graphs
 3. [ ] Assignment 2.3: Task parallelism
-   1. [x] Sequential merge sort
-   2. [ ] Parallel merge sort
+   - [x] Sequential merge sort
+   - [x] Parallel merge sort
+   - [ ] Verify correctness of merge sort
+   - [ ] Create different folders, one for each version
 4. [ ] Assignment 2.4: Experimentation with task parallelism
+   - [ ] Generate experimental results
+   - [ ] Make graphs
 5. [ ] Assignment 2.5: Combining loop and task parallelism
-   1. [x] Sequential vector sort
-   2. [x] Parallel vector sort
-   3. [x] Experiment with OpenMP to find optimal scheduling etc.
-   4. [ ] Combine with task-parallel merge sort
-   5. [ ] Run different versions of vecsort to generate experimental results
+   - [x] Sequential vector sort
+   - [x] Parallel vector sort
+   - [x] Experiment with OpenMP to find optimal scheduling etc.
+   - [ ] Verify correctness of vecsort
+   - [ ] Create different folders, one for each version
+   - [ ] Combine with task-parallel merge sort
+   - [ ] Run different versions of vecsort to generate experimental results
+   - [ ] Make graphs
 6. [ ] Report
+   - [ ] Outline and list of graphs
+   - [ ] Introduction
+   - [x] Research question(s)
+   - [ ] 
+   - ...
+   - [ ] Check spelling, style, etc. before handing in
 
 ## Assignment details
 

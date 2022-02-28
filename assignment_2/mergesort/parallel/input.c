@@ -44,9 +44,9 @@ int parse_arguments(int i_argc, char **i_argv, params* o_params)
                 {
                     fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
                 }
-                return -1;
+                return 1;
             default:
-                return -1;
+                return 1;
         }
     }
 
