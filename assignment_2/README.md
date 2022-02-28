@@ -30,12 +30,18 @@ _Submission due date: **Tuesday, March 1, 2022**_
    - [ ] Combine with task-parallel merge sort
    - [ ] Run different versions of vecsort to generate experimental results
    - [ ] Make graphs
-6. [ ] Report
-   - [ ] Outline and list of graphs
+6. [ ] Misc
+   - [ ] Write script to test vecsort (Thomas)
+   - [ ] Distribute experiments between us
+7. [ ] Report
+   - [x] Outline and list of graphs
    - [ ] Introduction
    - [x] Research question(s)
-   - [ ] 
-   - ...
+   - [ ] Design
+   - [ ] Implementation
+   - [ ] Experiments and results
+   - [ ] Figures
+   - [ ] Conclusion
    - [ ] Check spelling, style, etc. before handing in
 
 ## Assignment details
