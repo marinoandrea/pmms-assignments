@@ -21,6 +21,8 @@ void do_compute(const struct parameters *p, struct results *r)
     size_t n_report     = p->period;
     size_t printreports = p->printreports;
 
+    omp_set_num_threads(p->nthreads);
+
     // Allocating memory for the matrices. The heat matrix has 2 additional rows 
     // for the halo values.
     // NOTE: we create 2 heat matrices in order to have a front and back buffer
@@ -56,6 +58,11 @@ void do_compute(const struct parameters *p, struct results *r)
     struct timespec before, after;
     clock_gettime(CLOCK_MONOTONIC, &before);
 
+    // reduction utility arrays
+    double *maxs     = (double *)calloc(p->nthreads, sizeof(double));
+    double *mins     = (double *)calloc(p->nthreads, sizeof(double));
+    double *maxdiffs = (double *)calloc(p->nthreads, sizeof(double));
+
     while (i < n_iters + 1 && r->maxdiff >= p->threshold)
     {
         double heat_sum = 0;
@@ -66,6 +73,14 @@ void do_compute(const struct parameters *p, struct results *r)
             r->tmax     = 0.0;
             r->tmin     = DBL_MAX;
             r->maxdiff  = 0.0;
+
+            // reset reduction arrays
+            for (size_t tn = 0; tn < p->nthreads; tn++) 
+            {
+                maxs[tn]     = 0.0;
+                mins[tn]     = DBL_MAX;
+                maxdiffs[tn] = 0.0;
+            }
         }
 
         // swapping front and back buffer at every iteration
@@ -77,7 +92,7 @@ void do_compute(const struct parameters *p, struct results *r)
 #endif
         size_t row;
 
-        #pragma omp parallel for private(row)
+        #pragma omp parallel for private(row) schedule(static) reduction(+: heat_sum)
         for (row = 1; row < n_rows + 1; ++row)
         {
             size_t idx_row      = row * n_cols;
@@ -108,16 +123,15 @@ void do_compute(const struct parameters *p, struct results *r)
                 
                 if (i % n_report == 0 || i == n_iters)
                 {
-                    #pragma omp critical(critical_reporting)
-                    {
-                        double heat_abs_diff = fabs(prev_heat - next_heat);
-                        
-                        heat_sum    += next_heat;
+                    heat_sum += next_heat;
+                    
+                    int thread_idx = omp_get_thread_num();
 
-                        r->tmax     = fmax(r->tmax, next_heat);
-                        r->tmin     = fmin(r->tmin, next_heat);
-                        r->maxdiff  = fmax(r->maxdiff, heat_abs_diff);
-                    }
+                    double heat_abs_diff = fabs(prev_heat - next_heat);
+
+                    maxs[thread_idx]     = fmax(maxs[thread_idx], next_heat);
+                    mins[thread_idx]     = fmin(mins[thread_idx], next_heat);
+                    maxdiffs[thread_idx] = fmax(maxdiffs[thread_idx], heat_abs_diff);
                 }
 
 #ifdef DRAW_PGM
@@ -129,6 +143,14 @@ void do_compute(const struct parameters *p, struct results *r)
         if (i % n_report == 0 || i == n_iters) 
         {
             clock_gettime(CLOCK_MONOTONIC, &after);
+
+            // reduction
+            for (size_t tn = 0; tn < p->nthreads; tn++)
+            {
+                r->tmax     = fmax(r->tmax, maxs[tn]);
+                r->tmin     = fmin(r->tmin, mins[tn]);
+                r->maxdiff  = fmax(r->maxdiff, maxdiffs[tn]);
+            }
             
             r->tavg  = heat_sum / (double) n_cells;
             r->time  = (double)(after.tv_sec - before.tv_sec) +
@@ -146,6 +168,9 @@ void do_compute(const struct parameters *p, struct results *r)
 
     free(lookup_next_col);
     free(lookup_prev_col);
+    free(mins);
+    free(maxs);
+    free(maxdiffs);
     free(m_coef);
     free(m_heat_a);
     free(m_heat_b);
