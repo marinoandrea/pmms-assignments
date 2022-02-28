@@ -16,7 +16,7 @@ MAX_LINE_LENGTH = 70
 
 def main():
     args = parse_arguments(sys.argv[1:])
-    width, height = args.rows, args.cols
+    width, height = args.cols, args.rows
 
     out = f"P2\n{width} {height}\n{MAX_INT}\n"
 
