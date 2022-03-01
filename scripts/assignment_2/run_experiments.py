@@ -2,6 +2,7 @@
 import re
 import subprocess
 import sys
+import time
 from argparse import ArgumentParser
 
 # NOTE: this script must be run with the scripts/assignment_2 folder as CWD
@@ -10,10 +11,12 @@ DIR_SEQ = "../../assignment_1/heat_seq"
 DIR_OMP = "../../assignment_2/heat_omp"
 
 MAX_ITERS = 10000
-PERIODS = [50, 1000]
+PERIOD = 1000
 
 
 def main():
+    timestamp = time.time()
+
     args = parse_arguments(sys.argv[1:])
     N, M = args.rows, args.cols
     n_threads = args.threads
@@ -24,25 +27,25 @@ def main():
 
     n_cols, n_rows = parse_matrix_size(f"{DIR_PGM}/omp_{M}x{N}.pgm")
 
-    for period in PERIODS:
-        params = {
-            "n_cols": n_cols,
-            "n_rows": n_rows,
-            "max_iter": MAX_ITERS,
-            "period": period,
-            "threshold": 0.0001,
-            "input_file": f"omp_{M}x{N}.pgm",
-            "n_threads": n_threads
-        }
-        results.append(run_experiment(
-            {**params, "strategy": "seq"}))
-        results.append(run_experiment(
-            {**params, "strategy": "omp"}))
+    params = {
+        "n_cols": n_cols,
+        "n_rows": n_rows,
+        "max_iter": MAX_ITERS,
+        "period": PERIOD,
+        "threshold": 0.0001,
+        "input_file": f"omp_{M}x{N}.pgm",
+        "n_threads": n_threads
+    }
 
-    with open(f"results_{M}x{N}_p{n_threads}.tsv", 'w') as f:
+    if n_threads == 1:
+        results.append(run_experiment({**params, "strategy": "seq"}))
+
+    results.append(run_experiment({**params, "strategy": "omp"}))
+
+    with open(f"results_{M}x{N}_p{n_threads}_{timestamp}.tsv", 'w') as f:
         f.write(
             "idx\tinput_file\tstrategy\tn_threads\ttime\ttflops\tn_cols"
-            + "\tn_rows\tperiod\tmax_iter\tthreshold\n"
+            + "\tn_rows\tperiod\tmax_iter\tthreshold\ntimestamp"
         )
         for idx, result in enumerate(results):
             out = '\t'.join([
@@ -57,6 +60,7 @@ def main():
                 str(result['period']),
                 str(result['max_iter']),
                 str(result['threshold']),
+                str(timestamp),
             ])
             f.write(f"{out}\n")
 
