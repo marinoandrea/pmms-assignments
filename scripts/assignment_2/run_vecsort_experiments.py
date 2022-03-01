@@ -6,7 +6,11 @@ from argparse import ArgumentParser
 # NOTE: this script must be run with the scripts/assignment_2 folder as CWD
 DIR_VECSORT = "../../assignment_2/vecsort"
 
-VERSIONS_BEST = [
+VERSIONS_ADR = [
+    'parallel'
+]
+
+VERSIONS_INPUT_SIZES = [
     'parallel'
 ]
 
