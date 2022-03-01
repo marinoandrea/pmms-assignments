@@ -6,6 +6,8 @@
 !*.*
 # Unignore all dirs
 !*/
+# Don't ignore makefiles
+!**/Makefile
 
 # Output files
 *.o
