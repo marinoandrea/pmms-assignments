@@ -1,0 +1,9 @@
+idx	version	outer	inner_min	inner_max	adr	time
+0	parallel_combined	10	10	100000	random	2.795030e-02
+1	parallel_combined	100	10	100000	random	2.299077e-01
+2	parallel_combined	1000	10	100000	random	1.021398e+00
+3	parallel_combined	10000	10	100000	random	1.124987e+01
+4	sequential_with_parallel_mergesort	10	10	100000	random	4.948990e-02
+5	sequential_with_parallel_mergesort	100	10	100000	random	4.201467e-01
+6	sequential_with_parallel_mergesort	1000	10	100000	random	4.676773e+00
+7	sequential_with_parallel_mergesort	10000	10	100000	random	4.453508e+01
