@@ -50,7 +50,7 @@ def main():
             }
             results.append(run_experiment(version, params))
 
-    with open(f"results_{versions}.tsv", 'w') as f:
+    with open(f"results_{args.versions}.tsv", 'w') as f:
         f.write(
             "idx\tversion\touter\tinner_min\tinner_max\tadr\ttime\n"
         )
@@ -61,19 +61,30 @@ def main():
                 str(result['outer']),
                 str(result['inner_min']),
                 str(result['inner_max']),
-                "random"
+                "random",
+                str(result['time'].rstrip())
             ])
             f.write(f"{out}\n")
 
 
-def run_experiment(exp_dir, exp_input):
-    return subprocess.check_output([
-        f"{DIR_VECSORT}/{exp_dir}",
-        "-r"
+def run_experiment(version, exp_input):
+    output = subprocess.check_output([
+        f"{DIR_VECSORT}/{version}/{version}",
+        "-r",
         "-l", str(exp_input['outer']),
         "-n", str(exp_input['inner_min']),
         "-x", str(exp_input['inner_max']),
+        "-s", str(42),
+        "-p", str(32)
     ]).decode('utf-8')
+
+    return {
+        'version': version,
+        'outer': exp_input['outer'],
+        'inner_min': exp_input['inner_min'],
+        'inner_max': exp_input['inner_max'],
+        'time': output
+    }
 
 def run_build(versions):
     for dir in versions:
