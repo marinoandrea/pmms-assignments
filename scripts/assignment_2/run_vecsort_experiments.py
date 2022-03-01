@@ -44,8 +44,10 @@ def main():
         versions = VERSIONS_COMBINED_PARALLELISM
     elif args.versions == 'extra':
         versions = VERSIONS_EXTRA
-    elif args.versions == 'best':
-        versions = VERSIONS_BEST
+    elif args.versions == 'adr':
+        versions = VERSIONS_ADR
+    elif args.versions == 'input_sizes':
+        versions = VERSIONS_INPUT_SIZES
 
     run_build(versions)
 
