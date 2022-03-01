@@ -10,7 +10,15 @@ VERSIONS_ADR = [
     'parallel'
 ]
 
-VERSIONS_INPUT_SIZES = [
+VERSIONS_INPUT_SIZE_SMALL = [
+    'parallel'
+]
+
+VERSIONS_INPUT_SIZE_MEDIUM = [
+    'parallel'
+]
+
+VERSIONS_INPUT_SIZE_LARGE = [
     'parallel'
 ]
 
@@ -46,8 +54,12 @@ def main():
         versions = VERSIONS_EXTRA
     elif args.versions == 'adr':
         versions = VERSIONS_ADR
-    elif args.versions == 'input_sizes':
-        versions = VERSIONS_INPUT_SIZES
+    elif args.versions == 'input_size_small':
+        versions = VERSIONS_INPUT_SIZE_SMALL
+    elif args.versions == 'input_size_medium':
+        versions = VERSIONS_INPUT_SIZE_MEDIUM
+    elif args.versions == 'input_size_large':
+        versions = VERSIONS_INPUT_SIZE_LARGE
 
     run_build(versions)
 
