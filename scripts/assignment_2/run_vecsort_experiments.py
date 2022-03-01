@@ -6,6 +6,22 @@ from argparse import ArgumentParser
 # NOTE: this script must be run with the scripts/assignment_2 folder as CWD
 DIR_VECSORT = "../../assignment_2/vecsort"
 
+VERSIONS_ADR = [
+    'parallel'
+]
+
+VERSIONS_INPUT_SIZE_SMALL = [
+    'parallel'
+]
+
+VERSIONS_INPUT_SIZE_MEDIUM = [
+    'parallel'
+]
+
+VERSIONS_INPUT_SIZE_LARGE = [
+    'parallel'
+]
+
 VERSIONS_SCHEDULING = [
   'sequential',
   'parallel_static',
@@ -36,6 +52,14 @@ def main():
         versions = VERSIONS_COMBINED_PARALLELISM
     elif args.versions == 'extra':
         versions = VERSIONS_EXTRA
+    elif args.versions == 'adr':
+        versions = VERSIONS_ADR
+    elif args.versions == 'input_size_small':
+        versions = VERSIONS_INPUT_SIZE_SMALL
+    elif args.versions == 'input_size_medium':
+        versions = VERSIONS_INPUT_SIZE_MEDIUM
+    elif args.versions == 'input_size_large':
+        versions = VERSIONS_INPUT_SIZE_LARGE
 
     run_build(versions)
 
@@ -50,7 +74,7 @@ def main():
             }
             results.append(run_experiment(version, params))
 
-    with open(f"results_{versions}.tsv", 'w') as f:
+    with open(f"results_{args.versions}.tsv", 'w') as f:
         f.write(
             "idx\tversion\touter\tinner_min\tinner_max\tadr\ttime\n"
         )
@@ -61,19 +85,30 @@ def main():
                 str(result['outer']),
                 str(result['inner_min']),
                 str(result['inner_max']),
-                "random"
+                "random",
+                str(result['time'])
             ])
             f.write(f"{out}\n")
 
 
-def run_experiment(exp_dir, exp_input):
-    return subprocess.check_output([
-        f"{DIR_VECSORT}/{exp_dir}",
-        "-r"
+def run_experiment(version, exp_input):
+    output = subprocess.check_output([
+        f"{DIR_VECSORT}/{version}/{version}",
+        "-r",
         "-l", str(exp_input['outer']),
         "-n", str(exp_input['inner_min']),
         "-x", str(exp_input['inner_max']),
+        "-s", str(42),
+        "-p", str(32)
     ]).decode('utf-8')
+
+    return {
+        'version': version,
+        'outer': exp_input['outer'],
+        'inner_min': exp_input['inner_min'],
+        'inner_max': exp_input['inner_max'],
+        'time': output.split(' ')[-2]
+    }
 
 def run_build(versions):
     for dir in versions:

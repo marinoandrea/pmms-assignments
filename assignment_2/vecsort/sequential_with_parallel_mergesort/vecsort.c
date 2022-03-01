@@ -13,7 +13,14 @@ typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
 int debug = 0;
 
-void Merge(int *a, long begin, long mid, long end, int *b)
+int SEQUENTIAL_CUTOFF = 100;
+
+int compare(const void *a, const void *b)
+{   
+    return (* (int *)a) - (* (int *)b);
+}
+
+void merge(int *a, long begin, long mid, long end, int *b)
 {
     long i = begin, j = mid;
     
@@ -32,30 +39,37 @@ void Merge(int *a, long begin, long mid, long end, int *b)
     }
 }
 
-void Split(int *b, long begin, long end, int *a)
+inline void split(int *b, long begin, long end, int *a) 
 {
-    if(end - begin < 2)
+    if(end - begin < SEQUENTIAL_CUTOFF) 
+    {
+        qsort(a + begin, end - begin, sizeof(int), compare);
         return;
+    }
     
     long mid = (begin + end) / 2;
-    Split(a, begin, mid, b);
-    Split(a, mid, end, b);
+    
+    #pragma omp task shared(a, b) firstprivate(begin, mid)
+    split(a, begin, mid, b);
 
-    Merge(b, begin, mid, end, a);
+    #pragma omp task shared(a, b) firstprivate(mid, end)
+    split(a, mid, end, b);
+
+    #pragma omp taskwait
+
+    merge(b, begin, mid, end, a);
 }
-
 
 /* Sort vector v of l elements using mergesort */
 void msort(int *v, long l) {
     int *v_copy = (int*)malloc(l*sizeof(int));
     memcpy(v_copy, v, l*sizeof(int));
     
-    Split(v_copy, 0, l, v);
+    split(v_copy, 0, l, v);
 }
 
 //TODO: Just Do It. Don't let your dreams be dreams.
-void vecsort(int ** vectors, int lengths[], long length_outer, int num_threads) {
-    #pragma omp parallel for schedule(dynamic, 100) num_threads(num_threads)
+void vecsort(int * vectors[], int lengths[], long length_outer){
     for (long i = 0; i < length_outer; ++i) {
         msort(vectors[i], lengths[i]);
     }
@@ -181,7 +195,7 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &before);
 
     /* Sort */
-    vecsort(vector_vectors, vector_lengths, length_outer, num_threads);
+    vecsort(vector_vectors, vector_lengths, length_outer);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +

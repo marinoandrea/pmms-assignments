@@ -11,6 +11,12 @@
 /* Ordering of the vector */
 typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
+typedef struct
+{
+    int *array;
+    int length;
+} array_t;
+
 int debug = 0;
 
 void Merge(int *a, long begin, long mid, long end, int *b)
@@ -54,10 +60,12 @@ void msort(int *v, long l) {
 }
 
 //TODO: Just Do It. Don't let your dreams be dreams.
-void vecsort(int ** vectors, int lengths[], long length_outer, int num_threads) {
-    #pragma omp parallel for schedule(dynamic, 100) num_threads(num_threads)
+void vecsort(array_t *zipped_vectors, long length_outer, int num_threads) {
+    printf("start vecsort\n");
+    long chunk_size = 1; // length_outer / (long) num_threads;
+    #pragma omp parallel for schedule(dynamic, chunk_size) num_threads(num_threads) if(length_outer > 400)
     for (long i = 0; i < length_outer; ++i) {
-        msort(vectors[i], lengths[i]);
+        msort(zipped_vectors[i].array, zipped_vectors[i].length);
     }
 }
 
@@ -73,6 +81,10 @@ void print_v(int **vector_vectors, int *vector_lengths, long length_outer) {
         printf("\n");
     }
     printf("\n");
+}
+
+int cmp (const void * a, const void * b) {
+    return ((array_t *) a)->length - ((array_t *) b)->length;
 }
 
 int main(int argc, char **argv) {
@@ -148,27 +160,33 @@ int main(int argc, char **argv) {
 
     assert(length_inner_min < length_inner_max);
 
+    array_t *vectors_tuples = (array_t *)malloc(length_outer * sizeof(array_t));
+
+    printf("after tuples init\n");
+
     /* Determine length of inner vectors and fill them. */
     for (long i = 0; i < length_outer; i++) {
         int length_inner = (rand() % (length_inner_max + 1 - length_inner_min)) + length_inner_min ; //random number inclusive between min and max
-        vector_vectors[i] = (int *) malloc(length_inner * sizeof(int));
-        vector_lengths[i] = length_inner;
+        array_t al = { 0 };
+        al.array  = (int *) malloc(length_inner * sizeof(int));
+        al.length = length_inner;
+        vectors_tuples[i] = al;
 
         /* Allocate and fill inner vector. */
         switch (order) {
             case ASCENDING:
                 for (long j = 0; j < length_inner; j++) {
-                    vector_vectors[i][j] = (int) j;
+                    vectors_tuples[i].array[j] = (int) j;
                 }
                 break;
             case DESCENDING:
                 for (long j = 0; j < length_inner; j++) {
-                    vector_vectors[i][j] = (int) (length_inner - j);
+                    vectors_tuples[i].array[j] = (int) (length_inner - j);
                 }
                 break;
             case RANDOM:
                 for (long j = 0; j < length_inner; j++) {
-                    vector_vectors[i][j] = rand();
+                    vectors_tuples[i].array[j] = rand();
                 }
                 break;
         }
@@ -180,8 +198,11 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &before);
 
+    printf("before qsort\n");
     /* Sort */
-    vecsort(vector_vectors, vector_lengths, length_outer, num_threads);
+    qsort(vectors_tuples, length_outer, sizeof(array_t), cmp);
+
+    vecsort(vectors_tuples, length_outer, num_threads);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
@@ -192,6 +213,10 @@ int main(int argc, char **argv) {
     if(debug) {
         print_v(vector_vectors, vector_lengths, length_outer);
     }
+
+    free(vector_vectors);
+    free(vector_lengths);
+    free(vectors_tuples);
 
     return 0;
 }

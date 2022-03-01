@@ -1,0 +1,5 @@
+idx	version	outer	inner_min	inner_max	adr	time
+0	parallel	10	10	19990	random	7.700500e-03
+1	parallel	100	10	19990	random	7.137000e-02
+2	parallel	1000	10	19990	random	1.146781e-01
+3	parallel	10000	10	19990	random	2.390109e+00

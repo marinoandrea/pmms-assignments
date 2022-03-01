@@ -55,7 +55,7 @@ void msort(int *v, long l) {
 
 //TODO: Just Do It. Don't let your dreams be dreams.
 void vecsort(int ** vectors, int lengths[], long length_outer, int num_threads) {
-    #pragma omp parallel for schedule(dynamic, 100) num_threads(num_threads)
+    #pragma omp parallel for simd schedule(dynamic, 100) num_threads(num_threads)
     for (long i = 0; i < length_outer; ++i) {
         msort(vectors[i], lengths[i]);
     }
