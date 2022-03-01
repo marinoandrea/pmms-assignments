@@ -22,10 +22,11 @@ def main():
     results = []
 
     for version in VERSIONS:
-        params = {
-            "length": args.length
-        }
-        results.append(run_experiment(version, params))
+        for length in args.length:
+            params = {
+                "length": length
+            }
+            results.append(run_experiment(version, params))
 
     with open(f"../../data/raw/results_merge_sort.tsv", 'w') as f:
         f.write(
@@ -54,7 +55,7 @@ def run_experiment(version, exp_input):
     return {
         'version': version,
         'length': exp_input['length'],
-        'time': output.split(' ')[-2]
+        'time': output.split(' ')[-3]
     }
 
 def run_build(versions):
@@ -65,7 +66,7 @@ def run_build(versions):
 
 def parse_arguments(args):
     parser = ArgumentParser(description="Run merge sort experiments.")
-    parser.add_argument("-l", "--length", type=int, help="Length of the vector.", default=100000000)
+    parser.add_argument("-l", "--length", type=int, nargs="*", help="Length of the vector.", default=[100000000])
     parser.add_argument("-a", "--asc", help="Generate vector values in ascending order")
     parser.add_argument("-d", "--desc", help="Generate vector values in descending order.")
     parser.add_argument("-r", "--rand", help="Generate vector values randomly.")
