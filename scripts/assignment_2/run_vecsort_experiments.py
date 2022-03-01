@@ -9,16 +9,15 @@ DIR_VECSORT = "../../assignment_2/vecsort"
 VERSIONS_SCHEDULING = [
   'sequential',
   'parallel_static',
-  'parallel_dynamic_small_chunks',
-  'parallel_dynamic_medium_chunks',
-  'parallel_dynamic_large_chunks',
-  'parallel_guided_small_chunks',
-  'parallel_guided_medium_chunks',
-  'parallel_guided_large_chunks'
+  'parallel_dynamic_small_chunk_size',
+  'parallel_dynamic_medium_chunk_size',
+  'parallel_dynamic_large_chunk_size',
+  'parallel_guided_small_chunk_size',
+  'parallel_guided_medium_chunk_size',
+  'parallel_guided_large_chunk_size'
 ]
 
 VERSIONS_COMBINED_PARALLELISM = [
-  # best parallel
   'parallel_combined',
   'sequential_with_parallel_mergesort'
 ]
@@ -47,8 +46,7 @@ def main():
             params = {
                 "outer": length,
                 "inner_min": args.min,
-                "inner_max": args.max,
-                "adr": args.adr
+                "inner_max": args.max
             }
             results.append(run_experiment(version, params))
 
@@ -63,7 +61,7 @@ def main():
                 str(result['outer']),
                 str(result['inner_min']),
                 str(result['inner_max']),
-                str(result['adr'])
+                "random"
             ])
             f.write(f"{out}\n")
 
@@ -71,10 +69,10 @@ def main():
 def run_experiment(exp_dir, exp_input):
     return subprocess.check_output([
         f"{DIR_VECSORT}/{exp_dir}",
+        "-r"
         "-l", str(exp_input['outer']),
         "-n", str(exp_input['inner_min']),
         "-x", str(exp_input['inner_max']),
-        "-adr", str(exp_input['adr'])
     ]).decode('utf-8')
 
 def run_build(versions):
@@ -85,11 +83,13 @@ def run_build(versions):
 
 def parse_arguments(args):
     parser = ArgumentParser(description="Run vecsort experiments.")
-    parser.add_argument("-l", "--outer", type=int, nargs='*', help="Lengths of the outer vector.")
-    parser.add_argument("-n", "--min", type=int, help="Minimum length of the inner vector.")
-    parser.add_argument("-x", "--max", type=int, help="Maximum length of the inner vector.")
-    parser.add_argument("-a", "--adr", type=int, help="Generate inner vector values in ascending order, descending order, or randomly.")
-    parser.add_argument("-d", "--versions", type=str, help="List of directories to use.")
+    parser.add_argument("-l", "--outer", type=int, nargs='*', help="Lengths of the outer vector.", default=[1000])
+    parser.add_argument("-n", "--min", type=int, help="Minimum length of the inner vector.", default = 10)
+    parser.add_argument("-x", "--max", type=int, help="Maximum length of the inner vector.", default = 100000)
+    parser.add_argument("-a", "--asc", help="Generate inner vector values in ascending order")
+    parser.add_argument("-d", "--desc", help="Generate inner vector values in descending order.")
+    parser.add_argument("-r", "--rand", help="Generate inner vector values randomly.")
+    parser.add_argument("-v", "--versions", type=str, help="List of code version directories to use.")
     return parser.parse_args(args)
 
 if __name__ == '__main__':
