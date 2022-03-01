@@ -11,3 +11,7 @@ idx	version	outer	inner_min	inner_max	adr	time
 9	sequential	100	10	100000	random	3.350126e-01
 10	sequential	1000	10	100000	random	3.434883e+00
 11	sequential	10000	10	100000	random	3.531814e+01
+12	parallel	10	10	100000	random	4.872190e-02
+13	parallel	100	10	100000	random	4.556213e-01
+14	parallel	1000	10	100000	random	8.919061e-01
+15	parallel	10000	10	100000	random	1.204123e+01
