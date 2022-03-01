@@ -6,6 +6,10 @@ from argparse import ArgumentParser
 # NOTE: this script must be run with the scripts/assignment_2 folder as CWD
 DIR_VECSORT = "../../assignment_2/vecsort"
 
+VERSIONS_BEST = [
+    'parallel'
+]
+
 VERSIONS_SCHEDULING = [
   'sequential',
   'parallel_static',
@@ -36,6 +40,8 @@ def main():
         versions = VERSIONS_COMBINED_PARALLELISM
     elif args.versions == 'extra':
         versions = VERSIONS_EXTRA
+    elif args.versions == 'best':
+        versions = VERSIONS_BEST
 
     run_build(versions)
 
@@ -62,7 +68,7 @@ def main():
                 str(result['inner_min']),
                 str(result['inner_max']),
                 "random",
-                str(result['time'].rstrip())
+                str(result['time'])
             ])
             f.write(f"{out}\n")
 
@@ -83,7 +89,7 @@ def run_experiment(version, exp_input):
         'outer': exp_input['outer'],
         'inner_min': exp_input['inner_min'],
         'inner_max': exp_input['inner_max'],
-        'time': output
+        'time': output.split(' ')[-2]
     }
 
 def run_build(versions):
