@@ -114,6 +114,8 @@ int main(int argc, char **argv)
         print_v(vector, cli_params.length);
     }
 
+    omp_set_num_threads(cli_params.num_threads);
+
     clock_gettime(CLOCK_MONOTONIC, &before);
 
     #pragma omp parallel
