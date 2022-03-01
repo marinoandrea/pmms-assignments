@@ -1,0 +1,10 @@
+idx	version	length	adr	time
+0	sequential	100000000	random	2.198278e+01
+1	sequential	10000000	random	2.244085e+00
+2	sequential	1000000	random	2.202857e-01
+3	parallel	100000000	random	1.584482e+01
+4	parallel	10000000	random	1.589093e+00
+5	parallel	1000000	random	1.767684e-01
+6	parallel_single_task	100000000	random	1.557814e+01
+7	parallel_single_task	10000000	random	1.636685e+00
+8	parallel_single_task	1000000	random	1.509324e-01

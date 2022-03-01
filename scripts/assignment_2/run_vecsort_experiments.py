@@ -74,7 +74,7 @@ def main():
             }
             results.append(run_experiment(version, params))
 
-    with open(f"results_{args.versions}.tsv", 'w') as f:
+    with open(f"../../data/raw/results_{args.versions}.tsv", 'w') as f:
         f.write(
             "idx\tversion\touter\tinner_min\tinner_max\tadr\ttime\n"
         )
