@@ -1,7 +1,11 @@
-# Editor configs
-.idea
-.vs
-.vscode
+# This ignores all compiled binaries without extension:
+# -----------------------------------------------------
+# Ignore all
+*
+# Unignore all with extensions
+!*.*
+# Unignore all dirs
+!*/
 
 # Output files
 *.o
@@ -17,10 +21,13 @@ assignment_2/*/sequential/sequential
 
 assignment_2/**/*.txt
 
+# Editor configs
+.idea
+.vs
+.vscode
 
 # Jupyter checkpoints
 *-checkpoint.ipynb
 
-assignment_3/histo/with_mutual_ex/histo_atomic/histo_atomic
-
+# WSL stuff
 *Zone.Identifier
