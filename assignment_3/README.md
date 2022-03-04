@@ -13,6 +13,7 @@ _Submission due date: **Tuesday, March 15, 2022**._
 1. [ ] Assignment 3.1: Parallelisation of heat dissipation code with `pthreads`
    - [ ] Implement parallel heat dissipation simulation with `pthreads`
    - [ ] (_optional_) Experiment with different design choices
+   - [ ] Verify correctness
 2. [ ] Assignment 3.2: Experimentation with `pthreads` heat dissipation code
    - [ ] Generate experimental results
    - [ ] Make graphs
