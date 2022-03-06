@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <errno.h>
+#include "compute.h"
 
 void die(const char *msg){
     if (errno != 0) 
@@ -72,10 +73,6 @@ void print_image(int num_rows, int num_cols, int * image){
 		}
 	}
 	printf("\n");
-}
-
-void histogram(int * histo, int * image){
-    //TODO: For Students
 }
 
 int main(int argc, char *argv[]){
