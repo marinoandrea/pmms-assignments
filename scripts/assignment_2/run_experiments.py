@@ -15,7 +15,7 @@ PERIOD = 1000
 
 
 def main():
-    timestamp = time.time()
+ 	timestamp = int(time.time() * 1000)
 
     args = parse_arguments(sys.argv[1:])
     N, M = args.rows, args.cols

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <errno.h>
+#include "compute.h"
 
 void die(const char *msg){
     if (errno != 0) 
@@ -74,15 +75,11 @@ void print_image(int num_rows, int num_cols, int * image){
 	printf("\n");
 }
 
-void histogram(int * histo, int * image){
-    //TODO: For Students
-}
-
 int main(int argc, char *argv[]){
     int c;
     int seed = 42;
     const char *image_path = 0;
-    image_path ="../../../../images/pat1_100x150.pgm";
+    image_path ="../../../images/pat1_100x150.pgm";
     int gen_image = 0;
     int debug = 0;
 
@@ -125,7 +122,7 @@ int main(int argc, char *argv[]){
                 return -1;
         }
     }
-
+    
     int * image = (int *) malloc(sizeof(int) * num_cols * num_rows);
 
     /* Seed such that we can always reproduce the same random vector */

@@ -8,6 +8,9 @@
 !*/
 # Don't ignore makefiles
 !**/Makefile
+# Don't ignore Pipenv files
+!Pipfile
+
 
 # Output files
 *.o
