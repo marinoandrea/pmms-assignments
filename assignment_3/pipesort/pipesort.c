@@ -6,52 +6,51 @@
 #include <ctype.h>
 #include <errno.h>
 #include <pthread.h>
+#include <limits.h>
 
+/* Output from rand() is >= 0, so guaranteed to be different from END. */
 #define END -1
 
-/* Arguments for a comparator thread */
-struct thread_args_t {
+/* Function arguments for the comparator threads */
+typedef struct thread_args_t {
     int *values;
     int index;
     int length;
-};
+} thread_args_t;
 
-pthread_attr_t attr;
+static pthread_attr_t attr;
 
 void *compare(void *thread_args) {
     /* Receive parameters struct from parent thread */
-    struct thread_args_t *args = (struct thread_args_t *) thread_args;
+    thread_args_t *args = (thread_args_t *) thread_args;
     int *values = args->values;
     int length = args->length;
     int index = args->index;
 
     pthread_t child_thread;
-    int max = 0;
-
-    return EXIT_SUCCESS;
-
-    int next = values[index];
+    int current_max = 0;
 
     /* How do we get a next value from the parent? */
 
-    while(next != END) {
-        /* Compare incoming to stored number, store maximum */
+    // while(next != END) {
+    //     /* Compare incoming to stored number, store maximum */
+    //     current_max = max(current_max, next);
+        
+    //     /* Forward other value to next thread somehow */
 
-        /* Forward other value to next thread */
+    //     /* Create a child thread to receive lower numbers */
+    //     pthread_create(&child_thread, &attr, &compare, NULL);
+    // }
 
-        /* Create a child thread to receive lower numbers */
-        pthread_create(&child_thread, &attr, &compare, NULL);
-    }
+    // /* Forward internally stored number (int max) */
 
-    /* Forward internally stored number (int max) */
+    // /* Forward sorted values from parent thread until second END is received */
+    // while(next != END) {
+    //     /* Write incoming number from parent thread */
+    // }
 
-    /* Forward sorted values from parent thread until second END is received */
-    while(next != END) {
-        /* Write incoming number from parent thread */
-    }
-
-    /* Wait for child thread to complete */
-    pthread_join(child_thread, NULL);
+    // /* Wait for child thread to complete */
+    // pthread_join(child_thread, NULL);
 
     /* Terminate thread */
     return EXIT_SUCCESS;
@@ -66,7 +65,7 @@ int main(int argc, char *argv[]){
     struct timespec before;
     struct timespec  after;
 
-    struct thread_args_t thread_args;
+    thread_args_t thread_args;
     pthread_t child_thread;
 
     /* Read command-line options. */
@@ -89,32 +88,46 @@ int main(int argc, char *argv[]){
         }
     }
 
-    /* Find a thread-safe way to keep track of total number of threads */
-    /* Maybe a semaphore? */
-
     /* Seed such that we can always reproduce the same random vector */
     srand(seed);
 
     clock_gettime(CLOCK_MONOTONIC, &before);
 
-    /* Use only kernel threads */
+    /* Initialize semaphore for access to values sequence */
+    // if (sem_init(&sem, 0, 1) == -1) {
+    //     perror("Semaphore initialization failed.");
+    //     exit(EXIT_FAILURE);
+    // }
+
     pthread_attr_init(&attr);
+
+    /* Use only kernel threads (the default and only option on Linux) */    
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 
-    int values[length];
+    /* Set a small stack size to support a larger total number of threads,
+    it should be a multiple of _SC_PAGESIZE and at least PTHREAD_STACK_MIN */
+    pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN + sysconf(_SC_PAGESIZE));
 
+    /* Generate n random integers between 0 and RAND_MAX */
+    int values[length + 2];
     for (int i = 0; i < length; ++i) {
         values[i] = rand();
         printf("%d\n", values[i]);
     }
 
+    /* Terminate the values sequence by two END symbols */
+    values[length] = END;
+    values[length + 1] = END;
+
+    /* Initialize comparator thread arguments */
     thread_args.values = values;
     thread_args.length = length;
     thread_args.index = 0;
 
-    /* The master thread is the generator thread, all others are comparators */
+    /* The master thread is the generator, all others are comparators */
     pthread_create(&child_thread, &attr, &compare, &thread_args);
 
+    /* Wait for comparator threads to complete */
     pthread_join(child_thread, NULL);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
