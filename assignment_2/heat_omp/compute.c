@@ -63,6 +63,7 @@ void do_compute(const struct parameters *p, struct results *r)
     double *mins     = (double *)calloc(p->nthreads, sizeof(double));
     double *maxdiffs = (double *)calloc(p->nthreads, sizeof(double));
 
+    #pragma omp parallel
     while (i < n_iters + 1 && r->maxdiff >= p->threshold)
     {
         double heat_sum = 0;
@@ -92,7 +93,7 @@ void do_compute(const struct parameters *p, struct results *r)
 #endif
         size_t row;
 
-        #pragma omp parallel for private(row) schedule(static) reduction(+: heat_sum)
+        #pragma omp for private(row) schedule(static) reduction(+: heat_sum)
         for (row = 1; row < n_rows + 1; ++row)
         {
             size_t idx_row      = row * n_cols;
