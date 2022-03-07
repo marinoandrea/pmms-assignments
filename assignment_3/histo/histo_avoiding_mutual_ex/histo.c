@@ -41,7 +41,7 @@ void read_image(const char * image_path, int num_rows, int num_cols, int * image
 
     if (imgw != num_cols || imgh != num_rows) {
         fprintf(stderr, "input data size (%ux%u) does not match cylinder size (%zux%zu)\n",
-                imgw, imgh, num_cols, num_rows);
+                imgw, imgh, (size_t) num_cols, (size_t) num_rows);
         die("invalid input");
     }
 
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]){
     /* Do your thing here */
 
 
-    histogram(histo, image);
+    histogram(histo, image, num_threads, num_cols * num_rows);
 
     /* Do your thing here */
 

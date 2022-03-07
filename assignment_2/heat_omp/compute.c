@@ -59,13 +59,14 @@ void do_compute(const struct parameters *p, struct results *r)
     clock_gettime(CLOCK_MONOTONIC, &before);
 
     // reduction utility arrays
+    double *sums     = (double *)calloc(p->nthreads, sizeof(double));
     double *maxs     = (double *)calloc(p->nthreads, sizeof(double));
     double *mins     = (double *)calloc(p->nthreads, sizeof(double));
     double *maxdiffs = (double *)calloc(p->nthreads, sizeof(double));
-
+   
+    #pragma omp parallel
     while (i < n_iters + 1 && r->maxdiff >= p->threshold)
     {
-        double heat_sum = 0;
 
         if (i % n_report == 0 || i == n_iters)
         {
@@ -92,7 +93,7 @@ void do_compute(const struct parameters *p, struct results *r)
 #endif
         size_t row;
 
-        #pragma omp parallel for private(row) schedule(static) reduction(+: heat_sum)
+        #pragma omp parallel for private(row) schedule(static)
         for (row = 1; row < n_rows + 1; ++row)
         {
             size_t idx_row      = row * n_cols;
@@ -122,13 +123,12 @@ void do_compute(const struct parameters *p, struct results *r)
                 m_heat_next[idx_row + col] = next_heat;
                 
                 if (i % n_report == 0 || i == n_iters)
-                {
-                    heat_sum += next_heat;
-                    
+                {                    
                     int thread_idx = omp_get_thread_num();
 
                     double heat_abs_diff = fabs(prev_heat - next_heat);
 
+                    sums[thread_idx]    += next_heat;
                     maxs[thread_idx]     = fmax(maxs[thread_idx], next_heat);
                     mins[thread_idx]     = fmin(mins[thread_idx], next_heat);
                     maxdiffs[thread_idx] = fmax(maxdiffs[thread_idx], heat_abs_diff);
@@ -144,15 +144,19 @@ void do_compute(const struct parameters *p, struct results *r)
         {
             clock_gettime(CLOCK_MONOTONIC, &after);
 
+            double tsum = 0.0;
+
             // reduction
             for (size_t tn = 0; tn < p->nthreads; tn++)
             {
                 r->tmax     = fmax(r->tmax, maxs[tn]);
                 r->tmin     = fmin(r->tmin, mins[tn]);
                 r->maxdiff  = fmax(r->maxdiff, maxdiffs[tn]);
+
+                tsum += sums[tn];
             }
             
-            r->tavg  = heat_sum / (double) n_cells;
+            r->tavg  = tsum / (double) n_cells;
             r->time  = (double)(after.tv_sec - before.tv_sec) +
                        (double)(after.tv_nsec - before.tv_nsec) / 1e9;
 
