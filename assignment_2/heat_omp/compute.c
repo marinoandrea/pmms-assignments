@@ -63,10 +63,11 @@ void do_compute(const struct parameters *p, struct results *r)
     double *mins     = (double *)calloc(p->nthreads, sizeof(double));
     double *maxdiffs = (double *)calloc(p->nthreads, sizeof(double));
 
+    double heat_sum = 0;
+    
     #pragma omp parallel
     while (i < n_iters + 1 && r->maxdiff >= p->threshold)
     {
-        double heat_sum = 0;
 
         if (i % n_report == 0 || i == n_iters)
         {
