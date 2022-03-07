@@ -15,45 +15,51 @@
 typedef struct thread_args_t {
     int *values;
     int index;
-    int length;
 } thread_args_t;
 
+/* Pthread attributes are shared between all threads */
 static pthread_attr_t attr;
 
-void *compare(void *thread_args) {
-    /* Receive parameters struct from parent thread */
-    thread_args_t *args = (thread_args_t *) thread_args;
-    int *values = args->values;
-    int length = args->length;
-    int index = args->index;
+void *compare(void *args) {
+    thread_args_t *thread_args = (thread_args_t *) args;
+    int *values = thread_args->values;
+    int max = thread_args->index;
 
     pthread_t child_thread;
-    int current_max = 0;
+    thread_args_t child_args;
 
-    /* How do we get a next value from the parent? */
+    int current = max + 1;
 
-    // while(next != END) {
-    //     /* Compare incoming to stored number, store maximum */
-    //     current_max = max(current_max, next);
-        
-    //     /* Forward other value to next thread somehow */
+    /* Compare incoming to stored number, store maximum */
+    if (values[current] > values[max]) {
+        child_args.index = max;
+        max = current;
+    } else {
+        child_args.index = current;
+    }
 
-    //     /* Create a child thread to receive lower numbers */
-    //     pthread_create(&child_thread, &attr, &compare, NULL);
-    // }
+    child_args.values = values;
 
-    // /* Forward internally stored number (int max) */
+    /* Create a child thread to receive remaining numbers */
+    pthread_create(&child_thread, &attr, &compare, &child_args);
 
-    // /* Forward sorted values from parent thread until second END is received */
-    // while(next != END) {
-    //     /* Write incoming number from parent thread */
-    // }
+    /* Compare remaining numbers and keep track of max value */
+    while(values[current] != END) {
 
-    // /* Wait for child thread to complete */
-    // pthread_join(child_thread, NULL);
+    }
+
+    /* Forward internally stored number (int max) */
+
+    /* Forward sorted values from parent thread until second END is received */
+    while(values[current] != END) {
+
+    }
+
+    /* Wait for child thread to complete */
+    pthread_join(child_thread, NULL);
 
     /* Terminate thread */
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 int main(int argc, char *argv[]){
@@ -66,7 +72,7 @@ int main(int argc, char *argv[]){
     struct timespec  after;
 
     thread_args_t thread_args;
-    pthread_t child_thread;
+    pthread_t first_comparator;
 
     /* Read command-line options. */
     while((c = getopt(argc, argv, "l:s:p:")) != -1) {
@@ -93,12 +99,6 @@ int main(int argc, char *argv[]){
 
     clock_gettime(CLOCK_MONOTONIC, &before);
 
-    /* Initialize semaphore for access to values sequence */
-    // if (sem_init(&sem, 0, 1) == -1) {
-    //     perror("Semaphore initialization failed.");
-    //     exit(EXIT_FAILURE);
-    // }
-
     pthread_attr_init(&attr);
 
     /* Use only kernel threads (the default and only option on Linux) */    
@@ -121,14 +121,13 @@ int main(int argc, char *argv[]){
 
     /* Initialize comparator thread arguments */
     thread_args.values = values;
-    thread_args.length = length;
     thread_args.index = 0;
 
     /* The master thread is the generator, all others are comparators */
-    pthread_create(&child_thread, &attr, &compare, &thread_args);
+    pthread_create(&first_comparator, &attr, &compare, &thread_args);
 
     /* Wait for comparator threads to complete */
-    pthread_join(child_thread, NULL);
+    pthread_join(first_comparator, NULL);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
