@@ -43,6 +43,7 @@
      */
     clock_gettime(CLOCK_MONOTONIC, &before);
 
+    # pragma omp parallel
     for (iter = 1; iter <= p->maxiter; ++iter)
     {
         /* swap source and destination */
@@ -54,6 +55,7 @@
         double maxdiff = 0.0;
         
         /* compute */
+        #pragma omp parallel for private(row) schedule(static)
         for (i = 1; i < h - 1; ++i)
             for (j = 1; j < w - 1; ++j)
             {
