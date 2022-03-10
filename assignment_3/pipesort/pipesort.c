@@ -10,15 +10,15 @@
 
 /* Output from rand() is >= 0, so guaranteed to be different from END. */
 #define END -1
+#define UNINITIALIZED -2
 
 /* Function arguments for the comparator threads */
 typedef struct thread_comp_args_t {
-    int *values;
+    int *states;
     int *dirty_flags;
-    int *initialized_flags;
-    pthread_mutex_t *locks;
     int value_in;
     int *value_out;
+    pthread_mutex_t *locks;
     size_t index;
 } thread_comp_args_t;
 
@@ -27,6 +27,18 @@ typedef struct thread_gen_args_t {
     size_t length;
 } thread_gen_args_t;
 
+typedef enum 
+{
+    INIT,
+    READ_1,
+    READ_2,
+    WRITE_1,
+    WRITE_2,
+    WRITE_ONCE,
+    WRITE_END,
+    COMPLETE
+} comparator_state;
+
 /* Pthread attributes are shared between all threads */
 static pthread_attr_t attr;
 
@@ -34,18 +46,17 @@ void *compare(void *arg)
 {    
     thread_comp_args_t args = *(thread_comp_args_t *)arg;
 
-    int value_state;
+    int value_state = UNINITIALIZED;
     int value_pass;
-    int count_iter = 0;
-    int count_end = 0;
-    int count_end_pass = 0; 
 
-    while (count_end < 2)
+    while (args.states[args.index] != COMPLETE)
     {
-        if (!args.initialized_flags[args.index]) continue;
+        if (args.index == 0)
+            printf("thread: %i, state: %i \n", args.index, args.states[args.index]);
 
-        // Read loop
-        for (;;)
+        if (args.states[args.index] == INIT) continue;
+
+        while (args.states[args.index] == READ_1)
         {
             pthread_mutex_lock(&args.locks[args.index]);
             if (!args.dirty_flags[args.index])
@@ -54,19 +65,17 @@ void *compare(void *arg)
                 continue;
             }
 
-            if (args.value_in == END && count_end == 0)
+            if (value_state == UNINITIALIZED)
             {
-                count_end++;
-                value_pass = value_state;
+                value_state = args.value_in;
                 args.dirty_flags[args.index] = 0;
                 pthread_mutex_unlock(&args.locks[args.index]);   
                 break;
             }
-    
-            if (count_end == 1 || count_iter == 0)
+
+            if (args.value_in == END)
             {
-                value_pass = args.value_in;
-                args.dirty_flags[args.index] = 0;
+                args.states[args.index] = WRITE_ONCE;
                 pthread_mutex_unlock(&args.locks[args.index]);   
                 break;
             }
@@ -82,36 +91,14 @@ void *compare(void *arg)
             }
 
             args.dirty_flags[args.index] = 0;
+            args.states[args.index] = WRITE_1;
 
             pthread_mutex_unlock(&args.locks[args.index]);   
             break;
         }
 
-        if (count_end_pass == 0 && count_end == 1)
+        while (args.states[args.index] == WRITE_ONCE || args.states[args.index] == WRITE_END)
         {
-            for (;;)
-            {
-                pthread_mutex_lock(&args.locks[args.index + 1]);
-                if (args.dirty_flags[args.index + 1])
-                {
-                    pthread_mutex_unlock(&args.locks[args.index + 1]);
-                    continue;
-                }
-
-                *args.value_out = END;
-
-                pthread_mutex_unlock(&args.locks[args.index + 1]);   
-                break;
-            }
-
-            count_end_pass++;
-        }
-
-        // Write loop
-        for (;;)
-        {
-            if (count_iter == 0) break;
-
             pthread_mutex_lock(&args.locks[args.index + 1]);
             if (args.dirty_flags[args.index + 1])
             {
@@ -119,69 +106,133 @@ void *compare(void *arg)
                 continue;
             }
 
-            *args.value_out = value_pass;
+            args.value_out = args.states[args.index] == WRITE_ONCE ? value_state : END;
+            args.dirty_flags[args.index + 1] = 1;
+            args.states[args.index] = args.states[args.index] == WRITE_ONCE ? WRITE_END : READ_2;
+
+            pthread_mutex_unlock(&args.locks[args.index + 1]);
+            break;
+        }
+
+        while (args.states[args.index] == READ_2)
+        {
+            pthread_mutex_lock(&args.locks[args.index]);
+            if (!args.dirty_flags[args.index])
+            {
+                pthread_mutex_unlock(&args.locks[args.index]);
+                continue;
+            }
+
+            if (args.value_in == END)
+            {
+                args.states[args.index] = COMPLETE;
+                pthread_mutex_unlock(&args.locks[args.index]);   
+                break;
+            }
+         
+            value_pass = args.value_in;
+            args.dirty_flags[args.index] = 0;
+            args.states[args.index] = WRITE_2;
+
+            pthread_mutex_unlock(&args.locks[args.index]);   
+            break;
+        }
+
+        while (args.states[args.index] == WRITE_1 || args.states[args.index] == WRITE_2)
+        {
+            pthread_mutex_lock(&args.locks[args.index + 1]);
+            if (args.dirty_flags[args.index + 1])
+            {
+                pthread_mutex_unlock(&args.locks[args.index + 1]);
+                continue;
+            }
+
+            args.value_out = value_pass;
             args.dirty_flags[args.index + 1] = 1;
             
-            if (!args.initialized_flags[args.index + 1])
+            args.states[args.index] = args.states[args.index] == WRITE_1 ? READ_1 : READ_2;
+            
+            if (args.states[args.index + 1] == INIT)
             {
-                args.initialized_flags[args.index + 1] = 1;
+                args.states[args.index + 1] = READ_1;
             }
 
             pthread_mutex_unlock(&args.locks[args.index + 1]);   
             break;    
         }
-
-        count_iter++;
     }
-
-    // FIXME: only write if we do not have END as value
-    args.values[args.index] = value_state;
 }
 
 
 void *generate(void *arg)
 {
     thread_gen_args_t gen_args = *(thread_gen_args_t *)arg;
-    gen_args.length += 2;
-        
-    int *dirty_flags        = (int *)malloc(gen_args.length * sizeof(int));
-    int *initialized_flags  = (int *)malloc(gen_args.length * sizeof(int));
 
-    pthread_mutex_t *locks = (pthread_mutex_t *)malloc(gen_args.length * sizeof(pthread_mutex_t));
- 
+    int output_value;
+    
+    const size_t GENERATOR_IDX = gen_args.length; 
+
+    // the last flag is for the generator thread output queue
+    int *dirty_flags = (int *)malloc(sizeof(int) * (gen_args.length + 1));
+    // the last lock is for the generator thread       
+    pthread_mutex_t *locks = (pthread_mutex_t *)malloc((gen_args.length + 1) * sizeof(pthread_mutex_t));    
+    // initialize generator thread synchronization tools
+    dirty_flags[GENERATOR_IDX] = 0;
+    pthread_mutex_init(&locks[GENERATOR_IDX], NULL);
+
+    // comparator threads data structures
+    comparator_state *states = (comparator_state *)malloc(sizeof(comparator_state) * gen_args.length);
     pthread_t *thread_ids = (pthread_t *)malloc(gen_args.length * sizeof(pthread_t));
- 
     thread_comp_args_t *thread_args = (thread_comp_args_t *)malloc(gen_args.length * sizeof(thread_comp_args_t));
 
     // initialize the thread locks
     for (int i = 0; i < gen_args.length; i++)  
     {
-        dirty_flags[i] = 0;
-        initialized_flags[i] = 0;
+        states[i] = INIT;
     
         pthread_mutex_init(&locks[i], NULL);
-        thread_args[i].values = gen_args.values;
-        thread_args[i].dirty_flags = dirty_flags;
+        thread_args[i].states = states;
         thread_args[i].locks = locks;
+        thread_args[i].dirty_flags = dirty_flags;
         thread_args[i].index = i;
-
-        if (i < gen_args.length - 1)
-            thread_args[i].value_out = &thread_args[i + 1].value_in;
-        else
-            thread_args[i].value_out = NULL;
+        thread_args[i].value_out = (i < gen_args.length - 1) ? &thread_args[i + 1].value_in : &output_value;
     }
 
-    for (int i = 0; i < gen_args.length; i++)
+    for (int i = 0; i < gen_args.length + 2; i++)
     {
         pthread_mutex_lock(&locks[0]);
 
         thread_args[0].value_in = i < gen_args.length - 2 ? rand() : END;
+    
+        dirty_flags[0] = 1;
         
-        if (i == 0) initialized_flags[0] = 1;
+        if (i == 0)  states[0] = READ_1;
 
         pthread_mutex_unlock(&locks[0]);
 
-        pthread_create(&thread_ids[i], &attr, &compare, &thread_args[i]);
+        if (i < gen_args.length)
+        {
+            pthread_create(&thread_ids[i], &attr, &compare, &thread_args[i]);
+        }
+    }
+
+    for (int i = 0; i < gen_args.length; i++)
+    {
+        for (;;)
+        {
+            pthread_mutex_lock(&locks[GENERATOR_IDX]);
+            if (!dirty_flags[GENERATOR_IDX])
+            {
+                pthread_mutex_unlock(&locks[GENERATOR_IDX]);
+                continue;
+            }
+
+            gen_args.values[i] = output_value;
+            dirty_flags[GENERATOR_IDX] = 0;
+
+            pthread_mutex_unlock(&locks[GENERATOR_IDX]);
+            break;
+        }
     }
 
     for (int i = 0; i < gen_args.length; i++)
@@ -237,6 +288,7 @@ int main(int argc, char *argv[]){
     gen_args.length = length;
     gen_args.values = out_values;
 
+    printf("here\n");
     /* The master thread is the generator, all others are comparators */
     pthread_create(&generator_thread, &attr, &generate, &gen_args);
 
