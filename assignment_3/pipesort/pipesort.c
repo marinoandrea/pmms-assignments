@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <limits.h>
 
+#define PRINT_ARRAY
 /* Output from rand() is >= 0, so guaranteed to be different from END. */
 #define END -1
 
@@ -49,7 +50,7 @@ void lock_on_condition(pthread_mutex_t *lock, int *condition, int condition_fals
         pthread_mutex_lock(lock);
         if (condition_false ? *condition : !*condition)
         {
-            pthread_mutex_unlock(&lock);
+            pthread_mutex_unlock(lock);
             continue;
         }
         break;
@@ -60,18 +61,14 @@ void *compare(void *arg)
 {    
     thread_comp_args_t args = *(thread_comp_args_t *)arg;
 
-    int current_state = args.states[args.index];
-
     int value_hold;
     int value_pass;
 
-    while (current_state != COMPLETE)
-    {
-        current_state = args.states[args.index];
-        
-        // printf("thread: %i, state: %i, value_hold: %i\n", args.index, current_state, value_hold);
+    while (args.states[args.index] != COMPLETE)
+    {        
+        // printf("thread: %i, state: %i, value_hold: %i\n", args.index, args.states[args.index], value_hold);
 
-        switch (current_state)
+        switch (args.states[args.index])
         {
         case INIT:
             continue;
