@@ -55,7 +55,7 @@
         double maxdiff = 0.0;
         
         /* compute */
-        #pragma omp parallel for private(row) schedule(static)
+        #pragma omp parallel for private(i) schedule(static)
         for (i = 1; i < h - 1; ++i)
             for (j = 1; j < w - 1; ++j)
             {
