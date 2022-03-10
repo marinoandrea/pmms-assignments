@@ -71,9 +71,12 @@ void *compare(void *arg)
         
         // printf("thread: %i, state: %i, value_hold: %i\n", args.index, current_state, value_hold);
 
-        if (current_state == INIT) continue;
-
-        if (current_state == READ_0)
+        switch (current_state)
+        {
+        case INIT:
+            continue;
+        
+        case READ_0:
         {
             lock_on_condition(&args.locks[args.index], &args.dirty_flags[args.index], 0);
 
@@ -85,7 +88,7 @@ void *compare(void *arg)
             continue;
         }
 
-        if (current_state == READ_1)
+        case READ_1:
         {
             lock_on_condition(&args.locks[args.index], &args.dirty_flags[args.index], 1);
 
@@ -113,7 +116,8 @@ void *compare(void *arg)
             continue;
         }
 
-        if (current_state == WRITE_ONCE || current_state == WRITE_END)
+        case WRITE_ONCE:
+        case WRITE_END:
         {
             lock_on_condition(&args.locks[args.index + 1], &args.dirty_flags[args.index + 1], 0);
 
@@ -125,7 +129,7 @@ void *compare(void *arg)
             continue;
         }
 
-        if (current_state == READ_2)
+        case READ_2:
         {
             lock_on_condition(&args.locks[args.index], &args.dirty_flags[args.index], 1);
 
@@ -144,7 +148,8 @@ void *compare(void *arg)
             continue;
         }
 
-        if (current_state == WRITE_1 || current_state == WRITE_2)
+        case WRITE_1:
+        case WRITE_2:
         {
             lock_on_condition(&args.locks[args.index + 1], &args.dirty_flags[args.index + 1], 0);
 
@@ -161,6 +166,10 @@ void *compare(void *arg)
             pthread_mutex_unlock(&args.locks[args.index + 1]);
             continue;
         }
+
+        default:
+            continue;
+        }        
     }
 }
 
