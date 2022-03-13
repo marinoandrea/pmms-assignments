@@ -5,6 +5,8 @@
 #include <string.h>
 #include "compute.h"
 
+#define DRAW_PGM
+
 #pragma STDC FENV_ACCESS ON
 #pragma STDC FP_CONTRACT ON
 
@@ -58,7 +60,7 @@ void *do_work(void *arg)
                          + m_heat_prev[idx_row_next + col_prev]
                          + m_heat_prev[idx_row_prev + col_prev];
 
-            double prev_heat = m_heat_prev[idx_row + col];
+            double prev_heat = m_heat_prev[idx_row + col];            
             double next_heat = (1.0 - coef) * (sum_d * COEF_D + sum_s * COEF_S) + coef * prev_heat;
 
             m_heat_next[idx_row + col] = next_heat;
@@ -138,10 +140,14 @@ void do_compute(const struct parameters *p, struct results *r)
             workers[i].m_coef       = m_coef;
             workers[i].m_heat_prev  = m_heat_prev;
             workers[i].m_heat_next  = m_heat_next;
+  
             workers[i].row_from     = i * row_chunk + 1;
             workers[i].row_to       = (i + 1) * row_chunk + 1;
             workers[i].n_cols       = n_cols;
             workers[i].n_rows       = n_rows;
+
+            workers[i].lookup_next_col = lookup_next_col;
+            workers[i].lookup_prev_col = lookup_prev_col;
 
             pthread_create(&thread_ids[i], &thread_attrs, &do_work, &workers[i]);
         }
@@ -151,10 +157,14 @@ void do_compute(const struct parameters *p, struct results *r)
             workers[p->nthreads].m_coef      = m_coef;
             workers[p->nthreads].m_heat_prev = m_heat_prev;
             workers[p->nthreads].m_heat_next = m_heat_next;
-            workers[p->nthreads].row_from    = (n_rows - 1) - remainder;
-            workers[p->nthreads].row_to      = (n_rows - 1);
+
+            workers[p->nthreads].row_from    = n_rows - remainder + 1;
+            workers[p->nthreads].row_to      = n_rows + 1;
             workers[p->nthreads].n_cols      = n_cols;
             workers[p->nthreads].n_rows      = n_rows;
+
+            workers[p->nthreads].lookup_next_col = lookup_next_col;
+            workers[p->nthreads].lookup_prev_col = lookup_prev_col;
 
             do_work(&workers[p->nthreads]);
         }
