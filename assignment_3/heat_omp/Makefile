@@ -8,7 +8,7 @@ OBJ=$(patsubst %.c,%.o,$(SRC))
 CC=gcc
 INCLUDES=-I../../include
 ifndef DEBUG
-CFLAGS=-O2 -std=gnu99 -lm -fopenmp
+CFLAGS=-O3 -ffast-math -march=native -std=gnu99 -fopenmp
 LIB=
 else
 CFLAGS=-O0 -g3 -std=c99 -fopenmp
