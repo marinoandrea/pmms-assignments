@@ -5,8 +5,6 @@
 #include <string.h>
 #include "compute.h"
 
-#define DRAW_PGM
-
 #pragma STDC FENV_ACCESS ON
 #pragma STDC FP_CONTRACT ON
 
