@@ -7,20 +7,33 @@
 #include <errno.h>
 #include <pthread.h>
 #include <limits.h>
+#include <time.h>
 
-#define PRINT_ARRAY
 /* Output from rand() is >= 0, so guaranteed to be different from END. */
 #define END -1
 
+#define BUFFER_SIZE 2048
+
+typedef struct thread_buffer_t {
+   int data[BUFFER_SIZE];
+   int occupied;
+   int next_in;
+   int next_out;
+   pthread_mutex_t lock;
+   pthread_cond_t items;
+   pthread_cond_t space;
+} thread_buffer_t;
+
 /* Function arguments for the comparator threads */
 typedef struct thread_comp_args_t {
-    int *states;
-    int *dirty_flags;
-    int value_in;
-    int *value_out;
-    pthread_mutex_t *locks;
     size_t index;
+    thread_buffer_t *producer_buffer;
+    thread_buffer_t *consumer_buffer;
 } thread_comp_args_t;
+
+typedef struct thread_out_args_t {
+    thread_buffer_t *consumer_buffer;
+} thread_out_args_t;
 
 typedef struct thread_gen_args_t {
     int *values;
@@ -29,139 +42,223 @@ typedef struct thread_gen_args_t {
 
 typedef enum 
 {
-    INIT,
     READ_0,
     READ_1,
     READ_2,
     WRITE_1,
     WRITE_2,
     WRITE_ONCE,
-    WRITE_END,
-    COMPLETE
+    WRITE_END_1,
+    WRITE_END_2
 } comparator_state;
 
 /* Pthread attributes are shared between all threads */
 static pthread_attr_t attr;
 
-void lock_on_condition(pthread_mutex_t *lock, int *condition, int condition_false)
+void *output(void *arg)
 {
-    for (;;)
+    thread_out_args_t *args = (thread_out_args_t *)arg;
+
+    int count_end = 0;
+
+    while (count_end < 2)
     {
-        pthread_mutex_lock(lock);
-        if (condition_false ? *condition : !*condition)
+        pthread_mutex_lock(&args->consumer_buffer->lock);
+        while (args->consumer_buffer->occupied == 0)
         {
-            pthread_mutex_unlock(lock);
-            continue;
+            pthread_cond_wait(&args->consumer_buffer->items, 
+                              &args->consumer_buffer->lock);
         }
-        break;
+
+        int value_in = args->consumer_buffer->data[args->consumer_buffer->next_out];
+        
+        if (value_in == END)
+        {
+            count_end++;
+        }
+        else if (count_end == 1)
+        {
+            printf("%i ", value_in);
+        }
+
+        args->consumer_buffer->next_out = (args->consumer_buffer->next_out + 1) % BUFFER_SIZE;
+        args->consumer_buffer->occupied--;
+
+        pthread_cond_signal(&args->consumer_buffer->space);
+        pthread_mutex_unlock(&args->consumer_buffer->lock);   
     }
+
+    printf("\n");
+    return NULL;
 }
 
 void *compare(void *arg) 
 {    
-    thread_comp_args_t args = *(thread_comp_args_t *)arg;
+    thread_comp_args_t *args = (thread_comp_args_t *)arg;
 
-    int value_hold;
-    int value_pass;
+    int value_hold = 0;
+    int value_pass = 0;
+    comparator_state state = READ_0;
 
-    while (args.states[args.index] != COMPLETE)
-    {        
-        // printf("thread: %i, state: %i, value_hold: %i\n", args.index, args.states[args.index], value_hold);
-
-        switch (args.states[args.index])
+    for (;;)
+    {
+        switch (state)
         {
-        case INIT:
-            continue;
-        
         case READ_0:
         {
-            lock_on_condition(&args.locks[args.index], &args.dirty_flags[args.index], 0);
+            pthread_mutex_lock(&args->consumer_buffer->lock);
+            while (args->consumer_buffer->occupied == 0)
+            {
+                pthread_cond_wait(&args->consumer_buffer->items, 
+                                  &args->consumer_buffer->lock);
+            }
+            
+            value_hold = args->consumer_buffer->data[args->consumer_buffer->next_out];
+            
+            state = READ_1;
 
-            value_hold = args.value_in;
-            args.dirty_flags[args.index] = 0;
-            args.states[args.index] = READ_1;
+            args->consumer_buffer->next_out = (args->consumer_buffer->next_out + 1) % BUFFER_SIZE;
+            args->consumer_buffer->occupied--;
 
-            pthread_mutex_unlock(&args.locks[args.index]);   
+            pthread_cond_signal(&args->consumer_buffer->space);
+            pthread_mutex_unlock(&args->consumer_buffer->lock);  
+
             continue;
         }
 
         case READ_1:
         {
-            lock_on_condition(&args.locks[args.index], &args.dirty_flags[args.index], 1);
-
-            if (args.value_in == END)
+            pthread_mutex_lock(&args->consumer_buffer->lock);
+            while (args->consumer_buffer->occupied == 0)
             {
-                args.states[args.index] = WRITE_ONCE;
+                pthread_cond_wait(&args->consumer_buffer->items, 
+                                  &args->consumer_buffer->lock);
+            }
+
+            int value_in = args->consumer_buffer->data[args->consumer_buffer->next_out];
+
+            if (value_in == END)
+            {
+                state = WRITE_END_1;
             } 
             else
             {
-                if (args.value_in > value_hold)
+                if (value_in > value_hold)
                 {
                     value_pass = value_hold;
-                    value_hold = args.value_in;
+                    value_hold = value_in;
                 } 
                 else 
                 {
-                    value_pass = args.value_in;
+                    value_pass = value_in;
                 }
 
-                args.dirty_flags[args.index] = 0;
-                args.states[args.index] = WRITE_1;
+                state = WRITE_1;
             }
 
-            pthread_mutex_unlock(&args.locks[args.index]);   
+            args->consumer_buffer->next_out = (args->consumer_buffer->next_out + 1) % BUFFER_SIZE;
+            args->consumer_buffer->occupied--;
+
+            pthread_cond_signal(&args->consumer_buffer->space);
+            pthread_mutex_unlock(&args->consumer_buffer->lock);  
+
             continue;
         }
 
         case WRITE_ONCE:
-        case WRITE_END:
+        case WRITE_END_1:
         {
-            lock_on_condition(&args.locks[args.index + 1], &args.dirty_flags[args.index + 1], 0);
+            pthread_mutex_lock(&args->producer_buffer->lock);
+            while (args->producer_buffer->occupied == BUFFER_SIZE)
+            {
+                pthread_cond_wait(&args->producer_buffer->space, 
+                                  &args->producer_buffer->lock);
+            }
 
-            *args.value_out = args.states[args.index] == WRITE_ONCE ? value_hold : END;
-            args.dirty_flags[args.index + 1] = 1;
-            args.states[args.index] = args.states[args.index] == WRITE_ONCE ? WRITE_END : READ_2;
+            args->producer_buffer->data[args->producer_buffer->next_in] = (state == WRITE_END_1) ? END : value_hold;
 
-            pthread_mutex_unlock(&args.locks[args.index + 1]);
+            state = (state == WRITE_END_1) ? WRITE_ONCE : READ_2;
+
+            args->producer_buffer->next_in = (args->producer_buffer->next_in + 1) % BUFFER_SIZE;
+            args->producer_buffer->occupied++;
+
+            pthread_cond_signal(&args->producer_buffer->items);
+            pthread_mutex_unlock(&args->producer_buffer->lock);   
+
             continue;
         }
 
         case READ_2:
         {
-            lock_on_condition(&args.locks[args.index], &args.dirty_flags[args.index], 1);
-
-            if (args.value_in == END)
+            pthread_mutex_lock(&args->consumer_buffer->lock);
+            while (args->consumer_buffer->occupied == 0)
             {
-                args.states[args.index] = COMPLETE;
+                pthread_cond_wait(&args->consumer_buffer->items, 
+                                  &args->consumer_buffer->lock);
+            }
+
+            int value_in = args->consumer_buffer->data[args->consumer_buffer->next_out];
+
+            if (value_in == END)
+            {
+                state = WRITE_END_2;
             }
             else
             {
-                value_pass = args.value_in;
-                args.dirty_flags[args.index] = 0;
-                args.states[args.index] = WRITE_2;
+                value_pass = value_in;
+                state = WRITE_2;
             }
 
-            pthread_mutex_unlock(&args.locks[args.index]);
+            args->consumer_buffer->next_out = (args->consumer_buffer->next_out + 1) % BUFFER_SIZE;
+            args->consumer_buffer->occupied--;
+
+            pthread_cond_signal(&args->consumer_buffer->space);
+            pthread_mutex_unlock(&args->consumer_buffer->lock);
+
             continue;
         }
 
         case WRITE_1:
         case WRITE_2:
         {
-            lock_on_condition(&args.locks[args.index + 1], &args.dirty_flags[args.index + 1], 0);
-
-            *args.value_out = value_pass;
-            args.dirty_flags[args.index + 1] = 1;
-            
-            args.states[args.index] = args.states[args.index] == WRITE_1 ? READ_1 : READ_2;
-            
-            if (args.states[args.index + 1] == INIT)
+            pthread_mutex_lock(&args->producer_buffer->lock);
+            while (args->producer_buffer->occupied == BUFFER_SIZE)
             {
-                args.states[args.index + 1] = READ_0;
+                pthread_cond_wait(&args->producer_buffer->space, 
+                                  &args->producer_buffer->lock);
             }
+            
+            args->producer_buffer->data[args->producer_buffer->next_in] = value_pass;
 
-            pthread_mutex_unlock(&args.locks[args.index + 1]);
+            state = (state == WRITE_1) ? READ_1 : READ_2;
+
+            args->producer_buffer->next_in = (args->producer_buffer->next_in + 1) % BUFFER_SIZE;
+            args->producer_buffer->occupied++;
+
+            pthread_cond_signal(&args->producer_buffer->items);
+            pthread_mutex_unlock(&args->producer_buffer->lock);   
+
             continue;
+        }
+
+        case WRITE_END_2:
+        {
+            pthread_mutex_lock(&args->producer_buffer->lock);
+            while (args->producer_buffer->occupied == BUFFER_SIZE)
+            {
+                pthread_cond_wait(&args->producer_buffer->space, 
+                                  &args->producer_buffer->lock);
+            }
+                                    
+            args->producer_buffer->data[args->producer_buffer->next_in] = END;
+
+            args->producer_buffer->next_in = (args->producer_buffer->next_in + 1) % BUFFER_SIZE;
+            args->producer_buffer->occupied++;
+
+            pthread_cond_signal(&args->producer_buffer->items);
+            pthread_mutex_unlock(&args->producer_buffer->lock);      
+
+            return NULL;
         }
 
         default:
@@ -175,69 +272,67 @@ void *generate(void *arg)
 {
     thread_gen_args_t gen_args = *(thread_gen_args_t *)arg;
 
-    int output_value;
-    
-    const size_t GENERATOR_IDX = gen_args.length; 
+    pthread_t *thread_ids    = (pthread_t *)       malloc((gen_args.length + 1) * sizeof(pthread_t));
+    thread_buffer_t *buffers = (thread_buffer_t *) malloc((gen_args.length + 1) * sizeof(thread_buffer_t));
 
-    // the last flag is for the generator thread output queue
-    int *dirty_flags = (int *)malloc(sizeof(int) * (gen_args.length + 1));
-    // the last lock is for the generator thread       
-    pthread_mutex_t *locks = (pthread_mutex_t *)malloc((gen_args.length + 1) * sizeof(pthread_mutex_t));    
-    // initialize generator thread synchronization tools
-    dirty_flags[GENERATOR_IDX] = 0;
-    pthread_mutex_init(&locks[GENERATOR_IDX], NULL);
-
-    // comparator threads data structures
-    comparator_state *states = (comparator_state *)malloc(sizeof(comparator_state) * gen_args.length);
-    pthread_t *thread_ids = (pthread_t *)malloc(gen_args.length * sizeof(pthread_t));
+    // comparator threads args
     thread_comp_args_t *thread_args = (thread_comp_args_t *)malloc(gen_args.length * sizeof(thread_comp_args_t));
-
-    // initialize the thread locks
-    for (int i = 0; i < gen_args.length; i++)  
-    {
-        states[i] = INIT;
     
-        pthread_mutex_init(&locks[i], NULL);
-        thread_args[i].states = states;
-        thread_args[i].locks = locks;
-        thread_args[i].dirty_flags = dirty_flags;
-        thread_args[i].index = i;
-        thread_args[i].value_out = (i < gen_args.length - 1) ? &thread_args[i + 1].value_in : &output_value;
-    }
+    // output thread args
+    thread_out_args_t output_args = { 0 };
+    output_args.consumer_buffer = &buffers[gen_args.length];
 
-    for (int i = 0; i < gen_args.length + 2; i++)
+    // spawn the threads
+    for (int i = 0; i < gen_args.length + 1; i++)  
     {
-        pthread_mutex_lock(&locks[0]);
+        pthread_mutex_init(&buffers[i].lock, NULL);
+        pthread_cond_init(&buffers[i].items, NULL);
+        pthread_cond_init(&buffers[i].space, NULL);
 
-        thread_args[0].value_in = i < gen_args.length - 2 ? rand() : END;
-    
-        dirty_flags[0] = 1;
-        
-        if (i == 0) states[0] = READ_0;
-
-        pthread_mutex_unlock(&locks[0]);
+        buffers[i].next_in = 0;
+        buffers[i].next_out = 0;
+        buffers[i].occupied = 0;
 
         if (i < gen_args.length)
         {
+            thread_args[i].index = i;
+            thread_args[i].consumer_buffer = &buffers[i];
+            thread_args[i].producer_buffer = &buffers[i + 1];
+
             pthread_create(&thread_ids[i], &attr, &compare, &thread_args[i]);
+        }
+        else
+        {
+            pthread_create(&thread_ids[i], &attr, &output, &output_args);
         }
     }
 
-    for (int i = 0; i < gen_args.length; i++)
-    {
-        lock_on_condition(&locks[GENERATOR_IDX], &dirty_flags[GENERATOR_IDX], 0);
+    // generate numbers
+    for (int i = 0; i < gen_args.length + 2; i++)
+    {        
+        pthread_mutex_lock(&buffers[0].lock);
+        while (buffers[0].occupied == BUFFER_SIZE)
+        {
+            pthread_cond_wait(&buffers[0].space, 
+                              &buffers[0].lock);
+        }
 
-        gen_args.values[i] = output_value;
-        dirty_flags[GENERATOR_IDX] = 0;
+        buffers[0].data[buffers[0].next_in] = (i < gen_args.length) ? rand() : END;
 
-        pthread_mutex_unlock(&locks[GENERATOR_IDX]);
+        buffers[0].next_in = (buffers[0].next_in + 1) % BUFFER_SIZE;
+        buffers[0].occupied++;
+
+        pthread_cond_signal(&buffers[0].items);
+        pthread_mutex_unlock(&buffers[0].lock);
     }
 
-    for (int i = 0; i < gen_args.length; i++)
+    // terminate
+    for (int i = 0; i < gen_args.length + 1; i++)
     {
         pthread_join(thread_ids[i], NULL);
     }
 
+    return NULL;
 }
 
 int main(int argc, char *argv[]){
@@ -291,11 +386,6 @@ int main(int argc, char *argv[]){
 
     /* Wait for comparator threads to complete */
     pthread_join(generator_thread, NULL);
-
-#ifdef PRINT_ARRAY
-    for (int i = 0; i < length; i++) printf("%i ", out_values[i]);
-    printf("\n");
-#endif
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
