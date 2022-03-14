@@ -3,6 +3,7 @@
 #include <float.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include "compute.h"
 
 #pragma STDC FENV_ACCESS ON
@@ -105,7 +106,7 @@ void do_compute(const struct parameters *p, struct results *r)
     }
 
     pthread_t *thread_ids = malloc(p->nthreads * sizeof(thread_ids));
-    worker_t *workers = malloc((p->nthreads + 1) * sizeof(worker_t));
+    worker_t *workers = malloc(p->nthreads * sizeof(worker_t));
 
     pthread_attr_t thread_attrs;
     pthread_attr_init(&thread_attrs);
@@ -133,38 +134,39 @@ void do_compute(const struct parameters *p, struct results *r)
         begin_picture(i, n_cols, n_rows, p->io_tmin, p->io_tmax);
 #endif
 
+        size_t temp_remainder = remainder;
+        size_t last_row = 1;
+
         for (int i = 0; i < p->nthreads; ++i)
         {
             workers[i].m_coef       = m_coef;
             workers[i].m_heat_prev  = m_heat_prev;
             workers[i].m_heat_next  = m_heat_next;
   
-            workers[i].row_from     = i * row_chunk + 1;
-            workers[i].row_to       = (i + 1) * row_chunk + 1;
+            workers[i].row_from     = last_row;
+            workers[i].row_to       = last_row + row_chunk;
             workers[i].n_cols       = n_cols;
             workers[i].n_rows       = n_rows;
 
             workers[i].lookup_next_col = lookup_next_col;
             workers[i].lookup_prev_col = lookup_prev_col;
 
-            pthread_create(&thread_ids[i], &thread_attrs, &do_work, &workers[i]);
-        }
+            if (temp_remainder > 0)
+            {
+                temp_remainder--;
+                workers[i].row_to++;
+            }
 
-        if (remainder > 0)
-        {   
-            workers[p->nthreads].m_coef      = m_coef;
-            workers[p->nthreads].m_heat_prev = m_heat_prev;
-            workers[p->nthreads].m_heat_next = m_heat_next;
+            last_row = workers[i].row_to;
 
-            workers[p->nthreads].row_from    = n_rows - remainder + 1;
-            workers[p->nthreads].row_to      = n_rows + 1;
-            workers[p->nthreads].n_cols      = n_cols;
-            workers[p->nthreads].n_rows      = n_rows;
-
-            workers[p->nthreads].lookup_next_col = lookup_next_col;
-            workers[p->nthreads].lookup_prev_col = lookup_prev_col;
-
-            do_work(&workers[p->nthreads]);
+            if (i < p->nthreads - 1)
+            {
+                pthread_create(&thread_ids[i], &thread_attrs, &do_work, &workers[i]);
+            }
+            else
+            {
+                do_work(&workers[i]);
+            }
         }
 
         for (int i = 0; i < p->nthreads; ++i)
