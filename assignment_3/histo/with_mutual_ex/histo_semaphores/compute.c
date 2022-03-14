@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <stdio.h>
 
-pthread_mutex_t locks[256];
+sem_t locks[256];
 
 static int initialized = 0;
 
@@ -27,9 +28,9 @@ void *compute_bins(void *arg)
 
     for (int i = 0; i < 256; i++)
     {
-        pthread_mutex_lock(&locks[i]);
+        sem_wait(&locks[i]);
         task->histo[i] += local_bins[i];
-        pthread_mutex_unlock(&locks[i]);
+        sem_post(&locks[i]);
     }
 
     return NULL;
@@ -44,7 +45,7 @@ void histogram(int *histo, int *image, int n_threads, size_t img_size)
     if (!initialized)
     {
         initialized = 1;
-        for (int i = 0; i < 256; i++) pthread_mutex_init(&locks[i], NULL);
+        for (int i = 0; i < 256; i++) sem_init(&locks[i], 0, 1);
     }
 
     pthread_t *thread_ids = (pthread_t *)malloc(n_threads * sizeof(pthread_t));
