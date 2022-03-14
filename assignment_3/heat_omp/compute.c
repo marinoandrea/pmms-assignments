@@ -3,7 +3,6 @@
 #include <float.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 #include <omp.h>
 #include "compute.h"
 
