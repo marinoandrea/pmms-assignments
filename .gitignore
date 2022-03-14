@@ -26,6 +26,8 @@ assignment_2/*/sequential/sequential
 
 assignment_2/**/*.txt
 
+images/pat1_5000x5000.pgm
+
 # Editor configs
 .idea
 .vs
