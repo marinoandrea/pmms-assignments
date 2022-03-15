@@ -24,7 +24,7 @@ void *compute_bins(void *arg)
 
     for (int i = 0; i < 256; i++)
     {
-        task->histo[i] += local_bins[i];
+        task->histo[i] += (atomic_int)local_bins[i];
     }
 
     return NULL;
