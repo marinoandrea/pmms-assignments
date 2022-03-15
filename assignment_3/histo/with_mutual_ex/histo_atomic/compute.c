@@ -15,7 +15,7 @@ void *compute_bins(void *arg)
 {
     task_t *task = (task_t *)arg;
 
-    atomic_int local_bins[256] = { 0 };
+    int local_bins[256] = { 0 };
 
     for (size_t i = task->idx_start; i < task->idx_end; i++)
     {
