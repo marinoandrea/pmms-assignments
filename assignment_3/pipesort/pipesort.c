@@ -13,7 +13,7 @@
 /* Output from rand() is >= 0, so guaranteed to be different from END. */
 #define END -1
 
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 512
 
 typedef struct thread_buffer_t {
    int data[BUFFER_SIZE];
