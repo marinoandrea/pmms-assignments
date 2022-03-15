@@ -343,13 +343,12 @@ int main(int argc, char *argv[]){
 
     struct timespec before;
     struct timespec  after;
-    
+
     struct rlimit limit = { 0 };
-    limit.rlim_cur = RLIM_INFINITY;
-    limit.rlim_max = RLIM_INFINITY; 
+    limit.rlim_cur = 257268;
+    limit.rlim_max = 257268;
 
     setrlimit(RLIMIT_NPROC, &limit);
-    setrlimit(RLIMIT_CPU,   &limit);
 
     /* Read command-line options. */
     while((c = getopt(argc, argv, "l:s:p:")) != -1) {
