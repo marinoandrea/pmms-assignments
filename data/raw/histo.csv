@@ -24,6 +24,11 @@ Avoiding mutual exclusion,Random,8.631606e-03,5000,5000
 256 semaphores,Random,8.889633e-03,5000,5000
 256 semaphores,Random,8.983025e-03,5000,5000
 256 semaphores,Random,8.858970e-03,5000,5000
+STM,Random,2.411307e-02,5000,5000
+STM,Random,2.402131e-02,5000,5000
+STM,Random,8.726562e-03,5000,5000
+STM,Random,2.335856e-02,5000,5000
+STM,Random,8.635127e-03,5000,5000
 Avoiding mutual exclusion,Pattern,4.093060e-04,100,150
 Avoiding mutual exclusion,Pattern,4.062740e-04,100,150
 Avoiding mutual exclusion,Pattern,4.268350e-04,100,150
@@ -49,6 +54,11 @@ Avoiding mutual exclusion,Pattern,4.151030e-04,100,150
 256 semaphores,Pattern,3.861850e-04,100,150
 256 semaphores,Pattern,4.055820e-04,100,150
 256 semaphores,Pattern,3.887520e-04,100,150
+STM,Pattern,1.517138e-03,100,150
+STM,Pattern,1.286415e-03,100,150
+STM,Pattern,1.263103e-03,100,150
+STM,Pattern,1.232060e-03,100,150
+STM,Pattern,1.131612e-03,100,150
 Avoiding mutual exclusion,Areas,4.230030e-04,100,150
 Avoiding mutual exclusion,Areas,3.578360e-04,100,150
 Avoiding mutual exclusion,Areas,3.526430e-04,100,150
@@ -74,6 +84,11 @@ Avoiding mutual exclusion,Areas,3.737620e-04,100,150
 256 semaphores,Areas,5.145610e-04,100,150
 256 semaphores,Areas,4.951790e-04,100,150
 256 semaphores,Areas,3.345220e-04,100,150
+STM,Areas,1.204228e-03,100,150
+STM,Areas,1.202309e-03,100,150
+STM,Areas,1.220081e-03,100,150
+STM,Areas,1.166368e-03,100,150
+STM,Areas,1.143346e-03,100,150
 Avoiding mutual exclusion,Gradient,4.086380e-04,100,150
 Avoiding mutual exclusion,Gradient,3.743100e-04,100,150
 Avoiding mutual exclusion,Gradient,4.299160e-04,100,150
@@ -99,3 +114,8 @@ Avoiding mutual exclusion,Gradient,3.686320e-04,100,150
 256 semaphores,Gradient,3.293680e-04,100,150
 256 semaphores,Gradient,3.665750e-04,100,150
 256 semaphores,Gradient,4.092010e-04,100,150
+STM,Gradient,1.087601e-03,100,150
+STM,Gradient,1.092125e-03,100,150
+STM,Gradient,1.143909e-03,100,150
+STM,Gradient,1.064445e-03,100,150
+STM,Gradient,1.087398e-03,100,150
