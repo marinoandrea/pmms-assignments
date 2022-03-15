@@ -31,7 +31,7 @@ void *compute_bins(void *arg)
 }
 
 
-void histogram(int *histo, int *image, int n_threads, size_t img_size)
+void histogram(atomic_int *histo, int *image, int n_threads, size_t img_size)
 {
     pthread_t *thread_ids = (pthread_t *)malloc(n_threads * sizeof(pthread_t));
     
@@ -42,7 +42,7 @@ void histogram(int *histo, int *image, int n_threads, size_t img_size)
 
     for (int i = 0; i < n_threads; i++)
     {
-        tasks[i].histo     = (atomic_int *)histo;
+        tasks[i].histo     = histo;
         tasks[i].image     = image;
         tasks[i].idx_start = img_size / n_threads * i;
         tasks[i].idx_end   = img_size / n_threads * (i + 1);
