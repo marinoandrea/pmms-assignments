@@ -24,7 +24,7 @@ void *compute_bins(void *arg)
 
     for (size_t i = 0; i < 256; i++)
     {
-        task->histo[i] += local_bins[i];
+        atomic_fetch_add_explicit(&(task->histo[i]), local_bins[i], memory_order_relaxed);
     }
 
     return NULL;
