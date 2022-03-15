@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <limits.h>
 #include <time.h>
+#include <sys/resource.h>
 
 /* Output from rand() is >= 0, so guaranteed to be different from END. */
 #define END -1
@@ -342,6 +343,13 @@ int main(int argc, char *argv[]){
 
     struct timespec before;
     struct timespec  after;
+    
+    struct rlimit limit = { 0 };
+    limit.rlim_cur = RLIM_INFINITY;
+    limit.rlim_max = RLIM_INFINITY; 
+
+    setrlimit(RLIMIT_NPROC, &limit);
+    setrlimit(RLIMIT_CPU,   &limit);
 
     /* Read command-line options. */
     while((c = getopt(argc, argv, "l:s:p:")) != -1) {
