@@ -1,0 +1,81 @@
+variant,input_file,time,m,n
+Avoiding mutual exclusion,Random,2.240784e-02,5000,5000
+Avoiding mutual exclusion,Random,8.966539e-03,5000,5000
+Avoiding mutual exclusion,Random,8.778389e-03,5000,5000
+Avoiding mutual exclusion,Random,8.784614e-03,5000,5000
+Avoiding mutual exclusion,Random,8.631606e-03,5000,5000
+One mutex lock,Random,8.851486e-03,5000,5000
+One mutex lock,Random,8.860543e-03,5000,5000
+One mutex lock,Random,8.868270e-03,5000,5000
+One mutex lock,Random,8.777040e-03,5000,5000
+One mutex lock,Random,8.850033e-03,5000,5000
+Multiple mutex locks,Random,8.840096e-03,5000,5000
+Multiple mutex locks,Random,8.715641e-03,5000,5000
+Multiple mutex locks,Random,8.878116e-03,5000,5000
+Multiple mutex locks,Random,8.762253e-03,5000,5000
+Multiple mutex locks,Random,8.867217e-03,5000,5000
+Semaphores,Random,8.763055e-03,5000,5000
+Semaphores,Random,8.804952e-03,5000,5000
+Semaphores,Random,8.889633e-03,5000,5000
+Semaphores,Random,8.983025e-03,5000,5000
+Semaphores,Random,8.858970e-03,5000,5000
+Avoiding mutual exclusion,Pattern,4.093060e-04,100,150
+Avoiding mutual exclusion,Pattern,4.062740e-04,100,150
+Avoiding mutual exclusion,Pattern,4.268350e-04,100,150
+Avoiding mutual exclusion,Pattern,3.957250e-04,100,150
+Avoiding mutual exclusion,Pattern,4.151030e-04,100,150
+One mutex lock,Pattern,3.728520e-04,100,150
+One mutex lock,Pattern,3.615880e-04,100,150
+One mutex lock,Pattern,3.733130e-04,100,150
+One mutex lock,Pattern,3.743830e-04,100,150
+One mutex lock,Pattern,3.602150e-04,100,150
+Multiple mutex locks,Pattern,3.393070e-04,100,150
+Multiple mutex locks,Pattern,3.489550e-04,100,150
+Multiple mutex locks,Pattern,3.578740e-04,100,150
+Multiple mutex locks,Pattern,4.355840e-04,100,150
+Multiple mutex locks,Pattern,3.763920e-04,100,150
+Semaphores,Pattern,4.001210e-04,100,150
+Semaphores,Pattern,3.968770e-04,100,150
+Semaphores,Pattern,3.861850e-04,100,150
+Semaphores,Pattern,4.055820e-04,100,150
+Semaphores,Pattern,3.887520e-04,100,150
+Avoiding mutual exclusion,Areas,4.230030e-04,100,150
+Avoiding mutual exclusion,Areas,3.578360e-04,100,150
+Avoiding mutual exclusion,Areas,3.526430e-04,100,150
+Avoiding mutual exclusion,Areas,3.865740e-04,100,150
+Avoiding mutual exclusion,Areas,3.737620e-04,100,150
+One mutex lock,Areas,3.175450e-04,100,150
+One mutex lock,Areas,3.760730e-04,100,150
+One mutex lock,Areas,3.577260e-04,100,150
+One mutex lock,Areas,3.298600e-04,100,150
+One mutex lock,Areas,3.598020e-04,100,150
+Multiple mutex locks,Areas,3.925660e-04,100,150
+Multiple mutex locks,Areas,3.638310e-04,100,150
+Multiple mutex locks,Areas,3.746090e-04,100,150
+Multiple mutex locks,Areas,3.856590e-04,100,150
+Multiple mutex locks,Areas,5.693280e-04,100,150
+Semaphores,Areas,5.410100e-04,100,150
+Semaphores,Areas,5.347650e-04,100,150
+Semaphores,Areas,5.145610e-04,100,150
+Semaphores,Areas,4.951790e-04,100,150
+Semaphores,Areas,3.345220e-04,100,150
+Avoiding mutual exclusion,Gradient,4.086380e-04,100,150
+Avoiding mutual exclusion,Gradient,3.743100e-04,100,150
+Avoiding mutual exclusion,Gradient,4.299160e-04,100,150
+Avoiding mutual exclusion,Gradient,3.494360e-04,100,150
+Avoiding mutual exclusion,Gradient,3.686320e-04,100,150
+One mutex lock,Gradient,3.633220e-04,100,150
+One mutex lock,Gradient,3.289140e-04,100,150
+One mutex lock,Gradient,3.545140e-04,100,150
+One mutex lock,Gradient,3.227270e-04,100,150
+One mutex lock,Gradient,3.797350e-04,100,150
+Multiple mutex locks,Gradient,3.808500e-04,100,150
+Multiple mutex locks,Gradient,3.344180e-04,100,150
+Multiple mutex locks,Gradient,3.443580e-04,100,150
+Multiple mutex locks,Gradient,3.535790e-04,100,150
+Multiple mutex locks,Gradient,3.292240e-04,100,150
+Semaphores,Gradient,3.877660e-04,100,150
+Semaphores,Gradient,3.709520e-04,100,150
+Semaphores,Gradient,3.293680e-04,100,150
+Semaphores,Gradient,3.665750e-04,100,150
+Semaphores,Gradient,4.092010e-04,100,150
