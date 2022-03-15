@@ -42,7 +42,7 @@ void histogram(int *histo, int *image, int n_threads, size_t img_size)
 
     for (int i = 0; i < n_threads; i++)
     {
-        tasks[i].histo     = histo;
+        tasks[i].histo     = (atomic_int *)histo;
         tasks[i].image     = image;
         tasks[i].idx_start = img_size / n_threads * i;
         tasks[i].idx_end   = img_size / n_threads * (i + 1);
