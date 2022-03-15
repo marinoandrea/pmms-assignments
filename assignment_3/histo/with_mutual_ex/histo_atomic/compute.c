@@ -15,16 +15,16 @@ void *compute_bins(void *arg)
 {
     task_t *task = (task_t *)arg;
 
-    int local_bins[256] = { 0 };
+    atomic_int local_bins[256] = { 0 };
 
     for (size_t i = task->idx_start; i < task->idx_end; i++)
     {
         local_bins[task->image[i]]++;
     }
 
-    for (int i = 0; i < 256; i++)
+    for (size_t i = 0; i < 256; i++)
     {
-        task->histo[i] += (atomic_int)local_bins[i];
+        task->histo[i] += local_bins[i];
     }
 
     return NULL;
