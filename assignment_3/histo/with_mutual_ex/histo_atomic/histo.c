@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <errno.h>
+#include <stdatomic.h>
 #include "compute.h"
 
 void die(const char *msg){
@@ -53,7 +54,7 @@ void read_image(const char * image_path, int num_rows, int num_cols, int * image
     fclose(f);
 }
 
-void print_histo(int * histo){
+void print_histo(atomic_int * histo){
 	for (int i = 0; i < 256; ++i)
 	{	
 		if(i != 0 && (i % 10 == 0)) {
@@ -89,7 +90,7 @@ int main(int argc, char *argv[]){
 
     struct timespec before, after;
 
-    int * histo = (int *) calloc(256, sizeof(int));
+    atomic_int * histo = calloc(256, sizeof(int));
 
     /* Read command-line options. */
     while((c = getopt(argc, argv, "s:i:rp:n:m:g")) != -1) {
