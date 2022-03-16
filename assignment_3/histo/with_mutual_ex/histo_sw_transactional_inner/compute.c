@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdatomic.h>
 
 typedef struct {
     int *histo;
@@ -42,12 +43,27 @@ void histogram(int *histo, int *image, int n_threads, size_t img_size)
     
     task_t *tasks = (task_t *)malloc(n_threads * sizeof(task_t));
 
+    int chunk_size = img_size / n_threads;
+    int remainder = img_size - (n_threads * chunk_size);
+
+    int temp_remainder = remainder;
+    int last_pixel = 0;
+
     for (int i = 0; i < n_threads; i++)
     {
         tasks[i].histo     = histo;
         tasks[i].image     = image;
-        tasks[i].idx_start = img_size / n_threads * i;
-        tasks[i].idx_end   = img_size / n_threads * (i + 1);
+        tasks[i].idx_start = last_pixel;
+        tasks[i].idx_end   = last_pixel + chunk_size;
+
+        if (temp_remainder > 0)
+        {
+            temp_remainder--;
+            tasks[i].idx_end++;
+        }
+        
+        last_pixel = tasks[i].idx_end;
+
         pthread_create(&thread_ids[i], &thread_attrs, compute_bins, &tasks[i]);
     }
 
