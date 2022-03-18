@@ -1,0 +1,91 @@
+GPU	Measurement	Duration
+TitanX Maxwell	sequential	0.0500565
+TitanX Maxwell	kernel	0.00238589
+TitanX Maxwell	memory	0.0079492
+TitanX Maxwell	sequential	0.046141
+TitanX Maxwell	kernel	0.00238332
+TitanX Maxwell	memory	0.00785642
+TitanX Maxwell	sequential	0.0441498
+TitanX Maxwell	kernel	0.00227616
+TitanX Maxwell	memory	0.00750274
+TitanX Maxwell	sequential	0.0461917
+TitanX Maxwell	kernel	0.00238532
+TitanX Maxwell	memory	0.00792631
+TitanX Maxwell	sequential	0.0462196
+TitanX Maxwell	kernel	0.00238317
+TitanX Maxwell	memory	0.00788845
+TitanX Maxwell	sequential	0.0462386
+TitanX Maxwell	kernel	0.0023824
+TitanX Maxwell	memory	0.00790782
+TitanX Maxwell	sequential	0.0460941
+TitanX Maxwell	kernel	0.00238316
+TitanX Maxwell	memory	0.00790843
+TitanX Maxwell	sequential	0.0461902
+TitanX Maxwell	kernel	0.0023839
+TitanX Maxwell	memory	0.00792783
+TitanX Maxwell	sequential	0.0461514
+TitanX Maxwell	kernel	0.00238712
+TitanX Maxwell	memory	0.00790356
+TitanX Maxwell	sequential	0.0462033
+TitanX Maxwell	kernel	0.00238563
+TitanX Maxwell	memory	0.00788883
+TitanX Pascal	sequential	0.0761061
+TitanX Pascal	kernel	0.00155967
+TitanX Pascal	memory	0.00773507
+TitanX Pascal	sequential	0.0465254
+TitanX Pascal	kernel	0.00155493
+TitanX Pascal	memory	0.00791571
+TitanX Pascal	sequential	0.0695929
+TitanX Pascal	kernel	0.00145784
+TitanX Pascal	memory	0.00715087
+TitanX Pascal	sequential	0.05748
+TitanX Pascal	kernel	0.00156067
+TitanX Pascal	memory	0.00782522
+TitanX Pascal	sequential	0.0757355
+TitanX Pascal	kernel	0.00155999
+TitanX Pascal	memory	0.00813227
+TitanX Pascal	sequential	0.057404
+TitanX Pascal	kernel	0.00144808
+TitanX Pascal	memory	0.00724727
+TitanX Pascal	sequential	0.0758671
+TitanX Pascal	kernel	0.00156256
+TitanX Pascal	memory	0.00758497
+TitanX Pascal	sequential	0.0741466
+TitanX Pascal	kernel	0.00156078
+TitanX Pascal	memory	0.0120908
+TitanX Pascal	sequential	0.0434409
+TitanX Pascal	kernel	0.00143712
+TitanX Pascal	memory	0.00718574
+TitanX Pascal	sequential	0.0756455
+TitanX Pascal	kernel	0.00155587
+TitanX Pascal	memory	0.00781353
+RTX 2080 Ti	sequential	0.04759
+RTX 2080 Ti	kernel	0.000217902
+RTX 2080 Ti	memory	0.00711824
+RTX 2080 Ti	sequential	0.0712569
+RTX 2080 Ti	kernel	0.0002154
+RTX 2080 Ti	memory	0.00715528
+RTX 2080 Ti	sequential	0.0704324
+RTX 2080 Ti	kernel	0.000217606
+RTX 2080 Ti	memory	0.00713251
+RTX 2080 Ti	sequential	0.0736035
+RTX 2080 Ti	kernel	0.000216997
+RTX 2080 Ti	memory	0.00714815
+RTX 2080 Ti	sequential	0.0659789
+RTX 2080 Ti	kernel	0.00021738
+RTX 2080 Ti	memory	0.00713738
+RTX 2080 Ti	sequential	0.0724059
+RTX 2080 Ti	kernel	0.000214883
+RTX 2080 Ti	memory	0.0076037
+RTX 2080 Ti	sequential	0.0532117
+RTX 2080 Ti	kernel	0.000197191
+RTX 2080 Ti	memory	0.00635297
+RTX 2080 Ti	sequential	0.0403297
+RTX 2080 Ti	kernel	0.000159538
+RTX 2080 Ti	memory	0.00523184
+RTX 2080 Ti	sequential	0.035863
+RTX 2080 Ti	kernel	0.000134601
+RTX 2080 Ti	memory	0.00442482
+RTX 2080 Ti	sequential	0.0554549
+RTX 2080 Ti	kernel	0.000163646
+RTX 2080 Ti	memory	0.00540054
