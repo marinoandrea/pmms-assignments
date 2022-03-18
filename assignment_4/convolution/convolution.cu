@@ -20,33 +20,41 @@
 using namespace std;
 
 void convolutionSeq(float *output, float *input, float *filter) {
-    //for each pixel in the output image
+    timer sequentialTime = timer("Sequential");
+    
+    sequentialTime.start();
 
-  timer sequentialTime = timer("Sequential");
-  
-  sequentialTime.start();
-
+    // For each pixel in the output image
     for (int y=0; y < image_height; y++) {
         for (int x=0; x < image_width; x++) { 
-	    output[y*image_width+x]=0;
-            //for each filter weight
+            output[y*image_width+x]=0;
+            
+            // For each filter weight
             for (int i=0; i < filter_height; i++) {
                 for (int j=0; j < filter_width; j++) {
                     output[y*image_width+x] += input[(y+i)*input_width+x+j] * filter[i*filter_width+j];
                 }
             }
-	    output[y*image_width+x] /= 35;
+
+	        output[y*image_width+x] /= 35;
         }
     }
   
-  sequentialTime.stop(); 
-  cout << "convolution (sequential): \t\t" << sequentialTime << endl;
+    sequentialTime.stop(); 
+    cout << "convolution (sequential): \t\t" << sequentialTime << endl;
 
 }
 
 
-__global__ void convolution_kernel_naive(float *output, float *input, float *filter) {
-
+__global__ void convolution_kernel_naive(float *output, float *input, float *filter) {    
+    // For each filter weight
+    for (int i=0; i < filter_height; i++) {
+        for (int j=0; j < filter_width; j++) {
+            output[y*image_width+x] += input[(y+i)*input_width+x+j] * filter[i*filter_width+j];
+        }
+    }
+    
+    output[y*image_width+x] /= 35;
 }
 
 void convolutionCUDA(float *output, float *input, float *filter) {
