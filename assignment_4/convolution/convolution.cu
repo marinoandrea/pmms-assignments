@@ -46,10 +46,14 @@ void convolutionSeq(float *output, float *input, float *filter) {
 }
 
 
-__global__ void convolution_kernel_naive(float *output, float *input, float *filter) {    
+__global__ void convolution_kernel_naive(float *output, float *input, float *filter) {
+    // TODO: Determine x and y based on Block ID and Grid ID.
+    size_t y = blockIdx.y * blockDim.y + threadIdx.y;
+    size_t x = blockIdx.x * blockDim.x + threadIdx.x;
+
     // For each filter weight
-    for (int i=0; i < filter_height; i++) {
-        for (int j=0; j < filter_width; j++) {
+    for (size_t i=0; i < filter_height; i++) {
+        for (size_t j=0; j < filter_width; j++) {
             output[y*image_width+x] += input[(y+i)*input_width+x+j] * filter[i*filter_width+j];
         }
     }
