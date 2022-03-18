@@ -10,33 +10,33 @@ _Submission due date: **Tuesday, March 15, 2022**._
 
 ## Todo list
 
-1. [ ] Assignment 3.1: Parallelisation of heat dissipation code with `pthreads`
+1. [x] Assignment 3.1: Parallelisation of heat dissipation code with `pthreads`
    - [x] Implement parallel heat dissipation simulation with OpenMP
    - [x] Implement parallel heat dissipation simulation with `pthreads`
    - [ ] (_optional_) Experiment with different design choices
-   - [ ] Verify correctness
-2. [ ] Assignment 3.2: Experimentation with `pthreads` heat dissipation code
-   - [ ] Generate experimental results
-   - [ ] Make graphs
-3. [ ] Assignment 3.3: Pipeline parallelism using POSIX Threads
+   - [x] Verify correctness
+2. [x] Assignment 3.2: Experimentation with `pthreads` heat dissipation code
+   - [x] Generate experimental results
+   - [x] Make graphs
+3. [x] Assignment 3.3: Pipeline parallelism using POSIX Threads
    - [x] Implement pipeline sort
    - [ ] Verify correctness
-4. [ ] Assignment 3.4: Mutual exclusion concepts
+4. [x] Assignment 3.4: Mutual exclusion concepts
    - [x] Implement image histogram algorithm with one mutex lock
    - [x] Implement image histogram algorithm with multiple mutex locks
    - [x] Implement image histogram algorithm with semaphores
-   - [ ] Implement image histogram algorithm with atomic operations
-   - [ ] Implement image histogram algorithm with software transactional memory
+   - [x] Implement image histogram algorithm with atomic operations
+   - [x] Implement image histogram algorithm with software transactional memory
    - [x] Implement image histogram algorithm with multiple sets of bins
    - [ ] Verify correctness of all five variants
-5. [ ] Assignment 3.5: Experimentation with mutual exclusion concepts
-   - [ ] Design experimental setup
-   - [ ] Identify all parameters (application and input) that can impact performance
-   - [ ] Write hypothesis for performance impact of each identified parameter
-   - [ ] Write a script to test many hypotheses and program variants easily
-   - [ ] Test hypotheses and generate experimental results
-   - [ ] Analyze results and make graphs
-   - [ ] Rank mutual exclusion concepts by relative performance and discuss advantages/disadvantages
+5. [x] Assignment 3.5: Experimentation with mutual exclusion concepts
+   - [x] Design experimental setup
+   - [x] Identify all parameters (application and input) that can impact performance
+   - [x] Write hypothesis for performance impact of each identified parameter
+   - [x] Write a script to test many hypotheses and program variants easily
+   - [x] Test hypotheses and generate experimental results
+   - [x] Analyze results and make graphs
+   - [x] Rank mutual exclusion concepts by relative performance and discuss advantages/disadvantages
 
 ## Assignment details
 
