@@ -11,9 +11,11 @@
 . /etc/bashrc
 . /etc/profile.d/modules.sh
 
-# Make sure CUDA modules are loaded regardless of .bashrc contents
-module load cuda80/toolkit
-module load cuda80/profiler
+# Make sure GCC and CUDA modules are loaded regardless of .bashrc contents
+# The TAs use CUDA 10, so this makes our results reproducible
+module load gcc/9.3.0
+module load cuda10.0/toolkit/10.0.130
+module load cuda10.0/profiler/10.0.130
 
 # Compile and run
 make clean
