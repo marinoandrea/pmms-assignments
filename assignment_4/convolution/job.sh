@@ -16,5 +16,6 @@ module load cuda80/toolkit
 module load cuda80/profiler
 
 # Compile and run
-nvcc -o convolution convolution.cu
-./convolution
+make clean
+make
+./myconvolution
