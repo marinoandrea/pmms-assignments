@@ -14,7 +14,13 @@ module load gcc/6.3.0
 module load cuda10.0/toolkit/10.0.130
 module load cuda10.0/profiler/10.0.130
 
-# Compile and run
+# Compile
 make clean
 make
-./myconvolution
+
+# Run 10 times
+for i in {1..10}
+do
+   printf "\nTitanX Maxwell, run %d.\n\n" $i
+   ./myconvolution
+done
