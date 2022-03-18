@@ -1,10 +1,8 @@
 #!/bin/sh
 #SBATCH --time=00:15:00
 #SBATCH -N 1
-#SBATCH -C TitanX
+#SBATCH -C TitanX-Pascal
 #SBATCH --gres=gpu:1
-
-# Other CPU type names that can be used: TitanX-Pascal and RTX2080Ti
 
 # Not sure what this does, I copied it from https://www.cs.vu.nl/das5/gpu.shtml
 . /etc/bashrc
