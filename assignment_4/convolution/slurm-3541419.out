@@ -1,0 +1,79 @@
+rm -f *.o myconvolution
+nvcc -O3 -g --ptxas-options=-v -c convolution.cu -o convolution.o
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z24convolution_kernel_naivePfS_S_' for 'sm_30'
+ptxas info    : Function properties for _Z24convolution_kernel_naivePfS_S_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, 344 bytes cmem[0], 20 bytes cmem[2]
+g++ -O3 -m64 -Wall -c timer.cc -o timer.o
+nvcc convolution.o timer.o -o myconvolution
+
+TitanX Pascal, run 1.
+
+convolution (sequential): 		  = 0.0761061 seconds
+convolution (kernel): 		  = 0.00155967 seconds
+convolution (memory): 		  = 0.00773507 seconds
+TEST PASSED!
+
+TitanX Pascal, run 2.
+
+convolution (sequential): 		  = 0.0465254 seconds
+convolution (kernel): 		  = 0.00155493 seconds
+convolution (memory): 		  = 0.00791571 seconds
+TEST PASSED!
+
+TitanX Pascal, run 3.
+
+convolution (sequential): 		  = 0.0695929 seconds
+convolution (kernel): 		  = 0.00145784 seconds
+convolution (memory): 		  = 0.00715087 seconds
+TEST PASSED!
+
+TitanX Pascal, run 4.
+
+convolution (sequential): 		  =   0.05748 seconds
+convolution (kernel): 		  = 0.00156067 seconds
+convolution (memory): 		  = 0.00782522 seconds
+TEST PASSED!
+
+TitanX Pascal, run 5.
+
+convolution (sequential): 		  = 0.0757355 seconds
+convolution (kernel): 		  = 0.00155999 seconds
+convolution (memory): 		  = 0.00813227 seconds
+TEST PASSED!
+
+TitanX Pascal, run 6.
+
+convolution (sequential): 		  =  0.057404 seconds
+convolution (kernel): 		  = 0.00144808 seconds
+convolution (memory): 		  = 0.00724727 seconds
+TEST PASSED!
+
+TitanX Pascal, run 7.
+
+convolution (sequential): 		  = 0.0758671 seconds
+convolution (kernel): 		  = 0.00156256 seconds
+convolution (memory): 		  = 0.00758497 seconds
+TEST PASSED!
+
+TitanX Pascal, run 8.
+
+convolution (sequential): 		  = 0.0741466 seconds
+convolution (kernel): 		  = 0.00156078 seconds
+convolution (memory): 		  = 0.0120908 seconds
+TEST PASSED!
+
+TitanX Pascal, run 9.
+
+convolution (sequential): 		  = 0.0434409 seconds
+convolution (kernel): 		  = 0.00143712 seconds
+convolution (memory): 		  = 0.00718574 seconds
+TEST PASSED!
+
+TitanX Pascal, run 10.
+
+convolution (sequential): 		  = 0.0756455 seconds
+convolution (kernel): 		  = 0.00155587 seconds
+convolution (memory): 		  = 0.00781353 seconds
+TEST PASSED!

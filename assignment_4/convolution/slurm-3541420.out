@@ -1,0 +1,79 @@
+rm -f *.o myconvolution
+nvcc -O3 -g --ptxas-options=-v -c convolution.cu -o convolution.o
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z24convolution_kernel_naivePfS_S_' for 'sm_30'
+ptxas info    : Function properties for _Z24convolution_kernel_naivePfS_S_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, 344 bytes cmem[0], 20 bytes cmem[2]
+g++ -O3 -m64 -Wall -c timer.cc -o timer.o
+nvcc convolution.o timer.o -o myconvolution
+
+RTX 2080 Ti, run 1.
+
+convolution (sequential): 		  =   0.04759 seconds
+convolution (kernel): 		  = 0.000217902 seconds
+convolution (memory): 		  = 0.00711824 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 2.
+
+convolution (sequential): 		  = 0.0712569 seconds
+convolution (kernel): 		  = 0.0002154 seconds
+convolution (memory): 		  = 0.00715528 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 3.
+
+convolution (sequential): 		  = 0.0704324 seconds
+convolution (kernel): 		  = 0.000217606 seconds
+convolution (memory): 		  = 0.00713251 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 4.
+
+convolution (sequential): 		  = 0.0736035 seconds
+convolution (kernel): 		  = 0.000216997 seconds
+convolution (memory): 		  = 0.00714815 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 5.
+
+convolution (sequential): 		  = 0.0659789 seconds
+convolution (kernel): 		  = 0.00021738 seconds
+convolution (memory): 		  = 0.00713738 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 6.
+
+convolution (sequential): 		  = 0.0724059 seconds
+convolution (kernel): 		  = 0.000214883 seconds
+convolution (memory): 		  = 0.0076037 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 7.
+
+convolution (sequential): 		  = 0.0532117 seconds
+convolution (kernel): 		  = 0.000197191 seconds
+convolution (memory): 		  = 0.00635297 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 8.
+
+convolution (sequential): 		  = 0.0403297 seconds
+convolution (kernel): 		  = 0.000159538 seconds
+convolution (memory): 		  = 0.00523184 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 9.
+
+convolution (sequential): 		  =  0.035863 seconds
+convolution (kernel): 		  = 0.000134601 seconds
+convolution (memory): 		  = 0.00442482 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 10.
+
+convolution (sequential): 		  = 0.0554549 seconds
+convolution (kernel): 		  = 0.000163646 seconds
+convolution (memory): 		  = 0.00540054 seconds
+TEST PASSED!
