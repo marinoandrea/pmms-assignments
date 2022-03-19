@@ -12,27 +12,43 @@ def main():
   args = parse_arguments(sys.argv[1:])
 
   with open(f'{DIR_DATA}/convolution.tsv', 'w') as output_tsv:
-    output_tsv.write('GPU\tMeasurement\tDuration\n')
+    output_tsv.write('GPU\tRun\tMeasurement\tDuration\tSpeedup\n')
 
     for filename in args.filenames:
       filename = f'{DIR_DATA}/{filename}'
       
       with open(filename, 'r') as f:
+        run = 0
         gpu_type = None
+
+        sequential = None
+        kernel = None
+        memory = None
 
         for line in f.readlines():
           words = line.split()
 
           if len(words) > 1 and words[-2] == 'run':
+            run = words[-1][:-1]
             gpu_type = ' '.join(words[:-2])[:-1]
             print(gpu_type)
 
           if len(words) > 4 and words[-1] == 'seconds':
-            duration = words[-2]
+            duration = float(words[-2])
             measurement = words[-4][1:-2]
-            print(measurement)
-            print(duration)
-            output_tsv.write(f'{gpu_type}\t{measurement}\t{duration}\n')
+
+            if measurement == 'sequential':
+              sequential = duration
+            
+            if measurement == 'kernel':
+              kernel = duration
+
+            if measurement == 'memory':
+              memory = duration
+              output_tsv.write(f'{gpu_type}\t{run}\tsequential\t{sequential}\t{1.0}\n')
+              output_tsv.write(f'{gpu_type}\t{run}\tkernel\t{kernel}\t{sequential/kernel}\n')
+              output_tsv.write(f'{gpu_type}\t{run}\tmemory\t{memory}\t{sequential/memory}\n')
+              output_tsv.write(f'{gpu_type}\t{run}\tparallel\t{kernel+memory}\t{sequential/(kernel+memory)}\n')
 
 def parse_arguments(args):
   parser = ArgumentParser(description="Parse SLURM output for the convolution job scripts.")
