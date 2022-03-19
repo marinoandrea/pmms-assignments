@@ -1,91 +1,121 @@
-GPU	Measurement	Duration
-TitanX Maxwell	sequential	0.0500565
-TitanX Maxwell	kernel	0.00238589
-TitanX Maxwell	memory	0.0079492
-TitanX Maxwell	sequential	0.046141
-TitanX Maxwell	kernel	0.00238332
-TitanX Maxwell	memory	0.00785642
-TitanX Maxwell	sequential	0.0441498
-TitanX Maxwell	kernel	0.00227616
-TitanX Maxwell	memory	0.00750274
-TitanX Maxwell	sequential	0.0461917
-TitanX Maxwell	kernel	0.00238532
-TitanX Maxwell	memory	0.00792631
-TitanX Maxwell	sequential	0.0462196
-TitanX Maxwell	kernel	0.00238317
-TitanX Maxwell	memory	0.00788845
-TitanX Maxwell	sequential	0.0462386
-TitanX Maxwell	kernel	0.0023824
-TitanX Maxwell	memory	0.00790782
-TitanX Maxwell	sequential	0.0460941
-TitanX Maxwell	kernel	0.00238316
-TitanX Maxwell	memory	0.00790843
-TitanX Maxwell	sequential	0.0461902
-TitanX Maxwell	kernel	0.0023839
-TitanX Maxwell	memory	0.00792783
-TitanX Maxwell	sequential	0.0461514
-TitanX Maxwell	kernel	0.00238712
-TitanX Maxwell	memory	0.00790356
-TitanX Maxwell	sequential	0.0462033
-TitanX Maxwell	kernel	0.00238563
-TitanX Maxwell	memory	0.00788883
-TitanX Pascal	sequential	0.0761061
-TitanX Pascal	kernel	0.00155967
-TitanX Pascal	memory	0.00773507
-TitanX Pascal	sequential	0.0465254
-TitanX Pascal	kernel	0.00155493
-TitanX Pascal	memory	0.00791571
-TitanX Pascal	sequential	0.0695929
-TitanX Pascal	kernel	0.00145784
-TitanX Pascal	memory	0.00715087
-TitanX Pascal	sequential	0.05748
-TitanX Pascal	kernel	0.00156067
-TitanX Pascal	memory	0.00782522
-TitanX Pascal	sequential	0.0757355
-TitanX Pascal	kernel	0.00155999
-TitanX Pascal	memory	0.00813227
-TitanX Pascal	sequential	0.057404
-TitanX Pascal	kernel	0.00144808
-TitanX Pascal	memory	0.00724727
-TitanX Pascal	sequential	0.0758671
-TitanX Pascal	kernel	0.00156256
-TitanX Pascal	memory	0.00758497
-TitanX Pascal	sequential	0.0741466
-TitanX Pascal	kernel	0.00156078
-TitanX Pascal	memory	0.0120908
-TitanX Pascal	sequential	0.0434409
-TitanX Pascal	kernel	0.00143712
-TitanX Pascal	memory	0.00718574
-TitanX Pascal	sequential	0.0756455
-TitanX Pascal	kernel	0.00155587
-TitanX Pascal	memory	0.00781353
-RTX 2080 Ti	sequential	0.04759
-RTX 2080 Ti	kernel	0.000217902
-RTX 2080 Ti	memory	0.00711824
-RTX 2080 Ti	sequential	0.0712569
-RTX 2080 Ti	kernel	0.0002154
-RTX 2080 Ti	memory	0.00715528
-RTX 2080 Ti	sequential	0.0704324
-RTX 2080 Ti	kernel	0.000217606
-RTX 2080 Ti	memory	0.00713251
-RTX 2080 Ti	sequential	0.0736035
-RTX 2080 Ti	kernel	0.000216997
-RTX 2080 Ti	memory	0.00714815
-RTX 2080 Ti	sequential	0.0659789
-RTX 2080 Ti	kernel	0.00021738
-RTX 2080 Ti	memory	0.00713738
-RTX 2080 Ti	sequential	0.0724059
-RTX 2080 Ti	kernel	0.000214883
-RTX 2080 Ti	memory	0.0076037
-RTX 2080 Ti	sequential	0.0532117
-RTX 2080 Ti	kernel	0.000197191
-RTX 2080 Ti	memory	0.00635297
-RTX 2080 Ti	sequential	0.0403297
-RTX 2080 Ti	kernel	0.000159538
-RTX 2080 Ti	memory	0.00523184
-RTX 2080 Ti	sequential	0.035863
-RTX 2080 Ti	kernel	0.000134601
-RTX 2080 Ti	memory	0.00442482
-RTX 2080 Ti	sequential	0.0554549
-RTX 2080 Ti	kernel	0.000163646
-RTX 2080 Ti	memory	0.00540054
+GPU	Run	Measurement	Duration	Speedup
+TitanX Maxwell	1	sequential	0.0500565	1.0
+TitanX Maxwell	1	kernel	0.00238589	20.980221217239688
+TitanX Maxwell	1	memory	0.0079492	6.2970487596236095
+TitanX Maxwell	1	parallel	0.01033509	4.84335404916648
+TitanX Maxwell	2	sequential	0.046141	1.0
+TitanX Maxwell	2	kernel	0.00238332	19.35996844737593
+TitanX Maxwell	2	memory	0.00785642	5.8730312279638826
+TitanX Maxwell	2	parallel	0.010239739999999999	4.506071443220239
+TitanX Maxwell	3	sequential	0.0441498	1.0
+TitanX Maxwell	3	kernel	0.00227616	19.39661535217208
+TitanX Maxwell	3	memory	0.00750274	5.88449019958042
+TitanX Maxwell	3	parallel	0.0097789	4.5148022783748685
+TitanX Maxwell	4	sequential	0.0461917	1.0
+TitanX Maxwell	4	kernel	0.00238532	19.364990860765015
+TitanX Maxwell	4	memory	0.00792631	5.82764237078792
+TitanX Maxwell	4	parallel	0.01031163	4.479573064588237
+TitanX Maxwell	5	sequential	0.0462196	1.0
+TitanX Maxwell	5	kernel	0.00238317	19.394168271671766
+TitanX Maxwell	5	memory	0.00788845	5.859148501923698
+TitanX Maxwell	5	parallel	0.01027162	4.499738113364786
+TitanX Maxwell	6	sequential	0.0462386	1.0
+TitanX Maxwell	6	kernel	0.0023824	19.408411685695096
+TitanX Maxwell	6	memory	0.00790782	5.847199354562952
+TitanX Maxwell	6	parallel	0.01029022	4.493451063242574
+TitanX Maxwell	7	sequential	0.0460941	1.0
+TitanX Maxwell	7	kernel	0.00238316	19.34158847916212
+TitanX Maxwell	7	memory	0.00790843	5.828476701443902
+TitanX Maxwell	7	parallel	0.01029159	4.478812311800217
+TitanX Maxwell	8	sequential	0.0461902	1.0
+TitanX Maxwell	8	kernel	0.0023839	19.37589663995973
+TitanX Maxwell	8	memory	0.00792783	5.8263358321255625
+TitanX Maxwell	8	parallel	0.01031173	4.4793841576534685
+TitanX Maxwell	9	sequential	0.0461514	1.0
+TitanX Maxwell	9	kernel	0.00238712	19.33350648480177
+TitanX Maxwell	9	memory	0.00790356	5.839317978227533
+TitanX Maxwell	9	parallel	0.01029068	4.484776516226333
+TitanX Maxwell	10	sequential	0.0462033	1.0
+TitanX Maxwell	10	kernel	0.00238563	19.367336929867584
+TitanX Maxwell	10	memory	0.00788883	5.856800057803249
+TitanX Maxwell	10	parallel	0.01027446	4.496907866690805
+TitanX Pascal	1	sequential	0.0761061	1.0
+TitanX Pascal	1	kernel	0.00155967	48.79628382927157
+TitanX Pascal	1	memory	0.00773507	9.839096478764898
+TitanX Pascal	1	parallel	0.00929474	8.1880827220557
+TitanX Pascal	2	sequential	0.0465254	1.0
+TitanX Pascal	2	kernel	0.00155493	29.921218318509517
+TitanX Pascal	2	memory	0.00791571	5.877602893486498
+TitanX Pascal	2	parallel	0.009470639999999999	4.912593024336266
+TitanX Pascal	3	sequential	0.0695929	1.0
+TitanX Pascal	3	kernel	0.00145784	47.73699445755364
+TitanX Pascal	3	memory	0.00715087	9.732088543072381
+TitanX Pascal	3	parallel	0.00860871	8.084010264023297
+TitanX Pascal	4	sequential	0.05748	1.0
+TitanX Pascal	4	kernel	0.00156067	36.83033568915915
+TitanX Pascal	4	memory	0.00782522	7.345480382660168
+TitanX Pascal	4	parallel	0.009385890000000001	6.124086261398759
+TitanX Pascal	5	sequential	0.0757355	1.0
+TitanX Pascal	5	kernel	0.00155999	48.54870864556824
+TitanX Pascal	5	memory	0.00813227	9.312959358211176
+TitanX Pascal	5	parallel	0.009692260000000001	7.814018608662994
+TitanX Pascal	6	sequential	0.057404	1.0
+TitanX Pascal	6	kernel	0.00144808	39.641456273134075
+TitanX Pascal	6	memory	0.00724727	7.920775685189043
+TitanX Pascal	6	parallel	0.008695350000000001	6.601689408706951
+TitanX Pascal	7	sequential	0.0758671	1.0
+TitanX Pascal	7	kernel	0.00156256	48.55307956174484
+TitanX Pascal	7	memory	0.00758497	10.002294010391605
+TitanX Pascal	7	parallel	0.00914753	8.293725191390465
+TitanX Pascal	8	sequential	0.0741466	1.0
+TitanX Pascal	8	kernel	0.00156078	47.50611873550404
+TitanX Pascal	8	memory	0.0120908	6.132480894564462
+TitanX Pascal	8	parallel	0.01365158	5.43135666347778
+TitanX Pascal	9	sequential	0.0434409	1.0
+TitanX Pascal	9	kernel	0.00143712	30.227747160988642
+TitanX Pascal	9	memory	0.00718574	6.045431646566672
+TitanX Pascal	9	parallel	0.00862286	5.037876064322046
+TitanX Pascal	10	sequential	0.0756455	1.0
+TitanX Pascal	10	kernel	0.00155587	48.619421931138206
+TitanX Pascal	10	memory	0.00781353	9.681347611130947
+TitanX Pascal	10	parallel	0.0093694	8.073676009136124
+RTX 2080 Ti	1	sequential	0.04759	1.0
+RTX 2080 Ti	1	kernel	0.000217902	218.40093252930217
+RTX 2080 Ti	1	memory	0.00711824	6.685641394502012
+RTX 2080 Ti	1	parallel	0.0073361419999999995	6.487060910216842
+RTX 2080 Ti	2	sequential	0.0712569	1.0
+RTX 2080 Ti	2	kernel	0.0002154	330.81197771587745
+RTX 2080 Ti	2	memory	0.00715528	9.9586459230107
+RTX 2080 Ti	2	parallel	0.00737068	9.667615471028453
+RTX 2080 Ti	3	sequential	0.0704324	1.0
+RTX 2080 Ti	3	kernel	0.000217606	323.6693841162468
+RTX 2080 Ti	3	memory	0.00713251	9.874840694229663
+RTX 2080 Ti	3	parallel	0.007350116	9.582488221954593
+RTX 2080 Ti	4	sequential	0.0736035	1.0
+RTX 2080 Ti	4	kernel	0.000216997	339.19132522569436
+RTX 2080 Ti	4	memory	0.00714815	10.296860026720202
+RTX 2080 Ti	4	parallel	0.007365147	9.993486891707661
+RTX 2080 Ti	5	sequential	0.0659789	1.0
+RTX 2080 Ti	5	kernel	0.00021738	303.5187229735946
+RTX 2080 Ti	5	memory	0.00713738	9.244134402259652
+RTX 2080 Ti	5	parallel	0.007354759999999999	8.970911355367136
+RTX 2080 Ti	6	sequential	0.0724059	1.0
+RTX 2080 Ti	6	kernel	0.000214883	336.9549941130755
+RTX 2080 Ti	6	memory	0.0076037	9.522456172652788
+RTX 2080 Ti	6	parallel	0.007818583	9.260744562026137
+RTX 2080 Ti	7	sequential	0.0532117	1.0
+RTX 2080 Ti	7	kernel	0.000197191	269.8485224984913
+RTX 2080 Ti	7	memory	0.00635297	8.375877739073221
+RTX 2080 Ti	7	parallel	0.0065501610000000005	8.123723981746402
+RTX 2080 Ti	8	sequential	0.0403297	1.0
+RTX 2080 Ti	8	kernel	0.000159538	252.79055773546116
+RTX 2080 Ti	8	memory	0.00523184	7.708511728187407
+RTX 2080 Ti	8	parallel	0.005391378	7.480406678960371
+RTX 2080 Ti	9	sequential	0.035863	1.0
+RTX 2080 Ti	9	kernel	0.000134601	266.4393280882014
+RTX 2080 Ti	9	memory	0.00442482	8.104962461749857
+RTX 2080 Ti	9	parallel	0.004559421	7.865691718312478
+RTX 2080 Ti	10	sequential	0.0554549	1.0
+RTX 2080 Ti	10	kernel	0.000163646	338.87109981301097
+RTX 2080 Ti	10	memory	0.00540054	10.268399086017325
+RTX 2080 Ti	10	parallel	0.005564186	9.966399397863409
