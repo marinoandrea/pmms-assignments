@@ -1,0 +1,639 @@
+rm -f *.o myconvolution
+nvcc -O3 -g --ptxas-options=-v -c convolution.cu -o convolution.o
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z24convolution_kernel_naivePfS_S_' for 'sm_30'
+ptxas info    : Function properties for _Z24convolution_kernel_naivePfS_S_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, 344 bytes cmem[0], 20 bytes cmem[2]
+g++ -O3 -m64 -Wall -c timer.cc -o timer.o
+nvcc convolution.o timer.o -o myconvolution
+
+TitanX Pascal, run 1.
+
+convolution (sequential): 		  = 0.0521804 seconds
+convolution (kernel): 		  = 0.00156475 seconds
+convolution (memory): 		  = 0.00779671 seconds
+TEST PASSED!
+
+TitanX Pascal, run 2.
+
+convolution (sequential): 		  = 0.0753945 seconds
+convolution (kernel): 		  = 0.00156053 seconds
+convolution (memory): 		  = 0.0118695 seconds
+TEST PASSED!
+
+TitanX Pascal, run 3.
+
+convolution (sequential): 		  = 0.0469106 seconds
+convolution (kernel): 		  = 0.00155949 seconds
+convolution (memory): 		  = 0.00954675 seconds
+TEST PASSED!
+
+TitanX Pascal, run 4.
+
+convolution (sequential): 		  = 0.0728383 seconds
+convolution (kernel): 		  = 0.00154493 seconds
+convolution (memory): 		  = 0.0120003 seconds
+TEST PASSED!
+
+TitanX Pascal, run 5.
+
+convolution (sequential): 		  = 0.0469576 seconds
+convolution (kernel): 		  = 0.00156116 seconds
+convolution (memory): 		  = 0.00840698 seconds
+TEST PASSED!
+
+TitanX Pascal, run 6.
+
+convolution (sequential): 		  = 0.0470574 seconds
+convolution (kernel): 		  = 0.00155922 seconds
+convolution (memory): 		  = 0.00790203 seconds
+TEST PASSED!
+
+TitanX Pascal, run 7.
+
+convolution (sequential): 		  = 0.0784248 seconds
+convolution (kernel): 		  = 0.00155641 seconds
+convolution (memory): 		  = 0.00773582 seconds
+TEST PASSED!
+
+TitanX Pascal, run 8.
+
+convolution (sequential): 		  = 0.0719226 seconds
+convolution (kernel): 		  = 0.00155222 seconds
+convolution (memory): 		  = 0.00825082 seconds
+TEST PASSED!
+
+TitanX Pascal, run 9.
+
+convolution (sequential): 		  = 0.0550224 seconds
+convolution (kernel): 		  = 0.00155614 seconds
+convolution (memory): 		  = 0.00772808 seconds
+TEST PASSED!
+
+TitanX Pascal, run 10.
+
+convolution (sequential): 		  = 0.0779396 seconds
+convolution (kernel): 		  = 0.00154348 seconds
+convolution (memory): 		  = 0.0120128 seconds
+TEST PASSED!
+
+TitanX Pascal, run 11.
+
+convolution (sequential): 		  = 0.0739061 seconds
+convolution (kernel): 		  = 0.00154943 seconds
+convolution (memory): 		  = 0.00813166 seconds
+TEST PASSED!
+
+TitanX Pascal, run 12.
+
+convolution (sequential): 		  = 0.0748202 seconds
+convolution (kernel): 		  = 0.00154807 seconds
+convolution (memory): 		  =    0.0122 seconds
+TEST PASSED!
+
+TitanX Pascal, run 13.
+
+convolution (sequential): 		  =  0.047008 seconds
+convolution (kernel): 		  = 0.00156341 seconds
+convolution (memory): 		  = 0.0079086 seconds
+TEST PASSED!
+
+TitanX Pascal, run 14.
+
+convolution (sequential): 		  = 0.0596401 seconds
+convolution (kernel): 		  = 0.00155944 seconds
+convolution (memory): 		  = 0.00791648 seconds
+TEST PASSED!
+
+TitanX Pascal, run 15.
+
+convolution (sequential): 		  = 0.0770922 seconds
+convolution (kernel): 		  = 0.00156223 seconds
+convolution (memory): 		  = 0.00793895 seconds
+TEST PASSED!
+
+TitanX Pascal, run 16.
+
+convolution (sequential): 		  = 0.0740117 seconds
+convolution (kernel): 		  = 0.00154844 seconds
+convolution (memory): 		  = 0.0121765 seconds
+TEST PASSED!
+
+TitanX Pascal, run 17.
+
+convolution (sequential): 		  = 0.0738319 seconds
+convolution (kernel): 		  = 0.00155538 seconds
+convolution (memory): 		  = 0.00815376 seconds
+TEST PASSED!
+
+TitanX Pascal, run 18.
+
+convolution (sequential): 		  = 0.0698686 seconds
+convolution (kernel): 		  = 0.00155428 seconds
+convolution (memory): 		  = 0.00766674 seconds
+TEST PASSED!
+
+TitanX Pascal, run 19.
+
+convolution (sequential): 		  = 0.0576371 seconds
+convolution (kernel): 		  = 0.00156276 seconds
+convolution (memory): 		  = 0.0079099 seconds
+TEST PASSED!
+
+TitanX Pascal, run 20.
+
+convolution (sequential): 		  = 0.0783141 seconds
+convolution (kernel): 		  = 0.00156142 seconds
+convolution (memory): 		  = 0.00789101 seconds
+TEST PASSED!
+
+TitanX Pascal, run 21.
+
+convolution (sequential): 		  = 0.0759831 seconds
+convolution (kernel): 		  = 0.00154281 seconds
+convolution (memory): 		  = 0.0120638 seconds
+TEST PASSED!
+
+TitanX Pascal, run 22.
+
+convolution (sequential): 		  = 0.0470244 seconds
+convolution (kernel): 		  = 0.0015475 seconds
+convolution (memory): 		  =  0.011283 seconds
+TEST PASSED!
+
+TitanX Pascal, run 23.
+
+convolution (sequential): 		  = 0.0470707 seconds
+convolution (kernel): 		  = 0.00156093 seconds
+convolution (memory): 		  = 0.00790206 seconds
+TEST PASSED!
+
+TitanX Pascal, run 24.
+
+convolution (sequential): 		  = 0.0799715 seconds
+convolution (kernel): 		  = 0.00155592 seconds
+convolution (memory): 		  = 0.00755038 seconds
+TEST PASSED!
+
+TitanX Pascal, run 25.
+
+convolution (sequential): 		  = 0.0602434 seconds
+convolution (kernel): 		  = 0.0015611 seconds
+convolution (memory): 		  = 0.00793192 seconds
+TEST PASSED!
+
+TitanX Pascal, run 26.
+
+convolution (sequential): 		  = 0.0727414 seconds
+convolution (kernel): 		  = 0.00156223 seconds
+convolution (memory): 		  = 0.00790449 seconds
+TEST PASSED!
+
+TitanX Pascal, run 27.
+
+convolution (sequential): 		  = 0.0740759 seconds
+convolution (kernel): 		  = 0.00156423 seconds
+convolution (memory): 		  = 0.00789499 seconds
+TEST PASSED!
+
+TitanX Pascal, run 28.
+
+convolution (sequential): 		  = 0.0753589 seconds
+convolution (kernel): 		  = 0.00155288 seconds
+convolution (memory): 		  = 0.0121228 seconds
+TEST PASSED!
+
+TitanX Pascal, run 29.
+
+convolution (sequential): 		  = 0.0468427 seconds
+convolution (kernel): 		  = 0.00155886 seconds
+convolution (memory): 		  = 0.00789776 seconds
+TEST PASSED!
+
+TitanX Pascal, run 30.
+
+convolution (sequential): 		  = 0.0771274 seconds
+convolution (kernel): 		  = 0.00155795 seconds
+convolution (memory): 		  = 0.00788676 seconds
+TEST PASSED!
+
+TitanX Pascal, run 31.
+
+convolution (sequential): 		  = 0.0744633 seconds
+convolution (kernel): 		  = 0.00155903 seconds
+convolution (memory): 		  = 0.00791045 seconds
+TEST PASSED!
+
+TitanX Pascal, run 32.
+
+convolution (sequential): 		  = 0.0571733 seconds
+convolution (kernel): 		  = 0.00156037 seconds
+convolution (memory): 		  = 0.00786206 seconds
+TEST PASSED!
+
+TitanX Pascal, run 33.
+
+convolution (sequential): 		  = 0.0741553 seconds
+convolution (kernel): 		  = 0.00156003 seconds
+convolution (memory): 		  = 0.00791656 seconds
+TEST PASSED!
+
+TitanX Pascal, run 34.
+
+convolution (sequential): 		  = 0.0719989 seconds
+convolution (kernel): 		  = 0.00155316 seconds
+convolution (memory): 		  = 0.00820809 seconds
+TEST PASSED!
+
+TitanX Pascal, run 35.
+
+convolution (sequential): 		  = 0.0553056 seconds
+convolution (kernel): 		  = 0.00156327 seconds
+convolution (memory): 		  = 0.00793584 seconds
+TEST PASSED!
+
+TitanX Pascal, run 36.
+
+convolution (sequential): 		  = 0.0770565 seconds
+convolution (kernel): 		  =  0.001561 seconds
+convolution (memory): 		  = 0.00947158 seconds
+TEST PASSED!
+
+TitanX Pascal, run 37.
+
+convolution (sequential): 		  = 0.0739862 seconds
+convolution (kernel): 		  = 0.00155765 seconds
+convolution (memory): 		  = 0.00820754 seconds
+TEST PASSED!
+
+TitanX Pascal, run 38.
+
+convolution (sequential): 		  = 0.0548454 seconds
+convolution (kernel): 		  = 0.00144156 seconds
+convolution (memory): 		  = 0.0102764 seconds
+TEST PASSED!
+
+TitanX Pascal, run 39.
+
+convolution (sequential): 		  = 0.0470641 seconds
+convolution (kernel): 		  = 0.00156126 seconds
+convolution (memory): 		  = 0.00787241 seconds
+TEST PASSED!
+
+TitanX Pascal, run 40.
+
+convolution (sequential): 		  = 0.0623128 seconds
+convolution (kernel): 		  = 0.00156006 seconds
+convolution (memory): 		  = 0.00785246 seconds
+TEST PASSED!
+
+TitanX Pascal, run 41.
+
+convolution (sequential): 		  = 0.0659935 seconds
+convolution (kernel): 		  = 0.00145582 seconds
+convolution (memory): 		  = 0.00733457 seconds
+TEST PASSED!
+
+TitanX Pascal, run 42.
+
+convolution (sequential): 		  = 0.0743097 seconds
+convolution (kernel): 		  = 0.00155319 seconds
+convolution (memory): 		  = 0.00813739 seconds
+TEST PASSED!
+
+TitanX Pascal, run 43.
+
+convolution (sequential): 		  = 0.0553487 seconds
+convolution (kernel): 		  = 0.00155622 seconds
+convolution (memory): 		  = 0.00788209 seconds
+TEST PASSED!
+
+TitanX Pascal, run 44.
+
+convolution (sequential): 		  = 0.0621837 seconds
+convolution (kernel): 		  = 0.00145502 seconds
+convolution (memory): 		  = 0.00728885 seconds
+TEST PASSED!
+
+TitanX Pascal, run 45.
+
+convolution (sequential): 		  = 0.0763032 seconds
+convolution (kernel): 		  = 0.00155376 seconds
+convolution (memory): 		  = 0.0082134 seconds
+TEST PASSED!
+
+TitanX Pascal, run 46.
+
+convolution (sequential): 		  = 0.0719886 seconds
+convolution (kernel): 		  = 0.00155852 seconds
+convolution (memory): 		  = 0.00900585 seconds
+TEST PASSED!
+
+TitanX Pascal, run 47.
+
+convolution (sequential): 		  = 0.0736549 seconds
+convolution (kernel): 		  = 0.00144008 seconds
+convolution (memory): 		  = 0.00832825 seconds
+TEST PASSED!
+
+TitanX Pascal, run 48.
+
+convolution (sequential): 		  =  0.057413 seconds
+convolution (kernel): 		  = 0.00155603 seconds
+convolution (memory): 		  = 0.00917387 seconds
+TEST PASSED!
+
+TitanX Pascal, run 49.
+
+convolution (sequential): 		  = 0.0768447 seconds
+convolution (kernel): 		  = 0.00154903 seconds
+convolution (memory): 		  = 0.0125608 seconds
+TEST PASSED!
+
+TitanX Pascal, run 50.
+
+convolution (sequential): 		  = 0.0434601 seconds
+convolution (kernel): 		  = 0.00144533 seconds
+convolution (memory): 		  = 0.00732345 seconds
+TEST PASSED!
+
+TitanX Pascal, run 51.
+
+convolution (sequential): 		  =  0.079278 seconds
+convolution (kernel): 		  = 0.00155495 seconds
+convolution (memory): 		  =  0.009129 seconds
+TEST PASSED!
+
+TitanX Pascal, run 52.
+
+convolution (sequential): 		  = 0.0748592 seconds
+convolution (kernel): 		  = 0.00155096 seconds
+convolution (memory): 		  = 0.0090071 seconds
+TEST PASSED!
+
+TitanX Pascal, run 53.
+
+convolution (sequential): 		  = 0.0551465 seconds
+convolution (kernel): 		  = 0.00143988 seconds
+convolution (memory): 		  = 0.0070702 seconds
+TEST PASSED!
+
+TitanX Pascal, run 54.
+
+convolution (sequential): 		  = 0.0779829 seconds
+convolution (kernel): 		  = 0.00156396 seconds
+convolution (memory): 		  = 0.0120149 seconds
+TEST PASSED!
+
+TitanX Pascal, run 55.
+
+convolution (sequential): 		  = 0.0471422 seconds
+convolution (kernel): 		  = 0.00154435 seconds
+convolution (memory): 		  = 0.0111768 seconds
+TEST PASSED!
+
+TitanX Pascal, run 56.
+
+convolution (sequential): 		  = 0.0469901 seconds
+convolution (kernel): 		  = 0.00153015 seconds
+convolution (memory): 		  = 0.00849147 seconds
+TEST PASSED!
+
+TitanX Pascal, run 57.
+
+convolution (sequential): 		  = 0.0759434 seconds
+convolution (kernel): 		  = 0.00155802 seconds
+convolution (memory): 		  = 0.0118899 seconds
+TEST PASSED!
+
+TitanX Pascal, run 58.
+
+convolution (sequential): 		  = 0.0469554 seconds
+convolution (kernel): 		  = 0.00155579 seconds
+convolution (memory): 		  = 0.00772059 seconds
+TEST PASSED!
+
+TitanX Pascal, run 59.
+
+convolution (sequential): 		  = 0.0767565 seconds
+convolution (kernel): 		  = 0.00155518 seconds
+convolution (memory): 		  = 0.00810213 seconds
+TEST PASSED!
+
+TitanX Pascal, run 60.
+
+convolution (sequential): 		  = 0.0586319 seconds
+convolution (kernel): 		  = 0.00155978 seconds
+convolution (memory): 		  = 0.00783563 seconds
+TEST PASSED!
+
+TitanX Pascal, run 61.
+
+convolution (sequential): 		  = 0.0740024 seconds
+convolution (kernel): 		  = 0.00149495 seconds
+convolution (memory): 		  = 0.0115915 seconds
+TEST PASSED!
+
+TitanX Pascal, run 62.
+
+convolution (sequential): 		  =  0.047045 seconds
+convolution (kernel): 		  = 0.00155935 seconds
+convolution (memory): 		  =  0.007873 seconds
+TEST PASSED!
+
+TitanX Pascal, run 63.
+
+convolution (sequential): 		  = 0.0621409 seconds
+convolution (kernel): 		  = 0.00155843 seconds
+convolution (memory): 		  = 0.00794285 seconds
+TEST PASSED!
+
+TitanX Pascal, run 64.
+
+convolution (sequential): 		  = 0.0714425 seconds
+convolution (kernel): 		  = 0.00150174 seconds
+convolution (memory): 		  = 0.00799858 seconds
+TEST PASSED!
+
+TitanX Pascal, run 65.
+
+convolution (sequential): 		  = 0.0603472 seconds
+convolution (kernel): 		  = 0.00155641 seconds
+convolution (memory): 		  = 0.00766599 seconds
+TEST PASSED!
+
+TitanX Pascal, run 66.
+
+convolution (sequential): 		  = 0.0738969 seconds
+convolution (kernel): 		  = 0.00155327 seconds
+convolution (memory): 		  = 0.0119527 seconds
+TEST PASSED!
+
+TitanX Pascal, run 67.
+
+convolution (sequential): 		  = 0.0472109 seconds
+convolution (kernel): 		  = 0.00156058 seconds
+convolution (memory): 		  = 0.00792755 seconds
+TEST PASSED!
+
+TitanX Pascal, run 68.
+
+convolution (sequential): 		  = 0.0772476 seconds
+convolution (kernel): 		  = 0.00156043 seconds
+convolution (memory): 		  = 0.0079314 seconds
+TEST PASSED!
+
+TitanX Pascal, run 69.
+
+convolution (sequential): 		  =  0.073752 seconds
+convolution (kernel): 		  = 0.00154762 seconds
+convolution (memory): 		  = 0.0121863 seconds
+TEST PASSED!
+
+TitanX Pascal, run 70.
+
+convolution (sequential): 		  = 0.0743151 seconds
+convolution (kernel): 		  = 0.00155418 seconds
+convolution (memory): 		  = 0.00825748 seconds
+TEST PASSED!
+
+TitanX Pascal, run 71.
+
+convolution (sequential): 		  = 0.0571439 seconds
+convolution (kernel): 		  = 0.00155394 seconds
+convolution (memory): 		  = 0.00774173 seconds
+TEST PASSED!
+
+TitanX Pascal, run 72.
+
+convolution (sequential): 		  = 0.0565187 seconds
+convolution (kernel): 		  = 0.00155617 seconds
+convolution (memory): 		  = 0.00771963 seconds
+TEST PASSED!
+
+TitanX Pascal, run 73.
+
+convolution (sequential): 		  = 0.0741631 seconds
+convolution (kernel): 		  = 0.00155219 seconds
+convolution (memory): 		  = 0.00760274 seconds
+TEST PASSED!
+
+TitanX Pascal, run 74.
+
+convolution (sequential): 		  =  0.057034 seconds
+convolution (kernel): 		  = 0.00155433 seconds
+convolution (memory): 		  = 0.00757515 seconds
+TEST PASSED!
+
+TitanX Pascal, run 75.
+
+convolution (sequential): 		  = 0.0742692 seconds
+convolution (kernel): 		  = 0.00155664 seconds
+convolution (memory): 		  = 0.00820115 seconds
+TEST PASSED!
+
+TitanX Pascal, run 76.
+
+convolution (sequential): 		  = 0.0618528 seconds
+convolution (kernel): 		  = 0.00152459 seconds
+convolution (memory): 		  = 0.00805123 seconds
+TEST PASSED!
+
+TitanX Pascal, run 77.
+
+convolution (sequential): 		  = 0.0629437 seconds
+convolution (kernel): 		  = 0.00155522 seconds
+convolution (memory): 		  = 0.00771691 seconds
+TEST PASSED!
+
+TitanX Pascal, run 78.
+
+convolution (sequential): 		  =  0.076023 seconds
+convolution (kernel): 		  = 0.00154471 seconds
+convolution (memory): 		  = 0.0123453 seconds
+TEST PASSED!
+
+TitanX Pascal, run 79.
+
+convolution (sequential): 		  = 0.0761949 seconds
+convolution (kernel): 		  = 0.0015549 seconds
+convolution (memory): 		  = 0.00812508 seconds
+TEST PASSED!
+
+TitanX Pascal, run 80.
+
+convolution (sequential): 		  = 0.0739558 seconds
+convolution (kernel): 		  = 0.00155675 seconds
+convolution (memory): 		  = 0.00778688 seconds
+TEST PASSED!
+
+TitanX Pascal, run 81.
+
+convolution (sequential): 		  = 0.0468642 seconds
+convolution (kernel): 		  = 0.0015578 seconds
+convolution (memory): 		  = 0.00793485 seconds
+TEST PASSED!
+
+TitanX Pascal, run 82.
+
+convolution (sequential): 		  = 0.0669046 seconds
+convolution (kernel): 		  = 0.00154874 seconds
+convolution (memory): 		  = 0.0111532 seconds
+TEST PASSED!
+
+TitanX Pascal, run 83.
+
+convolution (sequential): 		  = 0.0468974 seconds
+convolution (kernel): 		  = 0.00156326 seconds
+convolution (memory): 		  = 0.00790233 seconds
+TEST PASSED!
+
+TitanX Pascal, run 84.
+
+convolution (sequential): 		  =  0.074406 seconds
+convolution (kernel): 		  = 0.00155438 seconds
+convolution (memory): 		  = 0.0077049 seconds
+TEST PASSED!
+
+TitanX Pascal, run 85.
+
+convolution (sequential): 		  = 0.0736265 seconds
+convolution (kernel): 		  = 0.00155699 seconds
+convolution (memory): 		  = 0.0118952 seconds
+TEST PASSED!
+
+TitanX Pascal, run 86.
+
+convolution (sequential): 		  = 0.0468889 seconds
+convolution (kernel): 		  = 0.00155901 seconds
+convolution (memory): 		  = 0.00848484 seconds
+TEST PASSED!
+
+TitanX Pascal, run 87.
+
+convolution (sequential): 		  =  0.076367 seconds
+convolution (kernel): 		  = 0.00155422 seconds
+convolution (memory): 		  = 0.00811734 seconds
+TEST PASSED!
+
+TitanX Pascal, run 88.
+
+convolution (sequential): 		  = 0.0774292 seconds
+convolution (kernel): 		  = 0.00155422 seconds
+convolution (memory): 		  = 0.00783461 seconds
+TEST PASSED!
+
+TitanX Pascal, run 89.
+
+convolution (sequential): 		  = 0.0769364 seconds
+convolution (kernel): 		  = 0.00155612 seconds
+convolution (memory): 		  = 0.00775637 seconds
+TEST PASSED!
+
+TitanX Pascal, run 90.
+
+convolution (sequential): 		  = 0.0714062 seconds
+convolution (kernel): 		  = 0.00150623 seconds
+convolution (memory): 		  = 0.00787363 seconds
+TEST PASSED!

@@ -1,0 +1,423 @@
+rm -f *.o myconvolution
+nvcc -O3 -g --ptxas-options=-v -c convolution.cu -o convolution.o
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z24convolution_kernel_naivePfS_S_' for 'sm_30'
+ptxas info    : Function properties for _Z24convolution_kernel_naivePfS_S_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, 344 bytes cmem[0], 20 bytes cmem[2]
+g++ -O3 -m64 -Wall -c timer.cc -o timer.o
+nvcc convolution.o timer.o -o myconvolution
+
+RTX 2080 Ti, run 1.
+
+convolution (sequential): 		  = 0.0472134 seconds
+convolution (kernel): 		  = 0.000217406 seconds
+convolution (memory): 		  = 0.00800851 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 2.
+
+convolution (sequential): 		  = 0.0726342 seconds
+convolution (kernel): 		  = 0.000216777 seconds
+convolution (memory): 		  = 0.00798845 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 3.
+
+convolution (sequential): 		  = 0.0726862 seconds
+convolution (kernel): 		  = 0.000218883 seconds
+convolution (memory): 		  = 0.00793946 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 4.
+
+convolution (sequential): 		  = 0.0759193 seconds
+convolution (kernel): 		  = 0.000217417 seconds
+convolution (memory): 		  = 0.00647785 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 5.
+
+convolution (sequential): 		  = 0.0727278 seconds
+convolution (kernel): 		  = 0.000217664 seconds
+convolution (memory): 		  = 0.00648716 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 6.
+
+convolution (sequential): 		  = 0.0727308 seconds
+convolution (kernel): 		  = 0.00021843 seconds
+convolution (memory): 		  = 0.00792048 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 7.
+
+convolution (sequential): 		  = 0.0704905 seconds
+convolution (kernel): 		  = 0.000215923 seconds
+convolution (memory): 		  = 0.00798712 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 8.
+
+convolution (sequential): 		  = 0.0713559 seconds
+convolution (kernel): 		  = 0.000201376 seconds
+convolution (memory): 		  = 0.00600136 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 9.
+
+convolution (sequential): 		  = 0.0789342 seconds
+convolution (kernel): 		  = 0.000217426 seconds
+convolution (memory): 		  = 0.00790987 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 10.
+
+convolution (sequential): 		  = 0.0732046 seconds
+convolution (kernel): 		  = 0.000206934 seconds
+convolution (memory): 		  = 0.0052964 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 11.
+
+convolution (sequential): 		  = 0.0769937 seconds
+convolution (kernel): 		  = 0.000208725 seconds
+convolution (memory): 		  = 0.00649192 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 12.
+
+convolution (sequential): 		  = 0.0732144 seconds
+convolution (kernel): 		  = 0.000208115 seconds
+convolution (memory): 		  = 0.00645993 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 13.
+
+convolution (sequential): 		  = 0.0733395 seconds
+convolution (kernel): 		  = 0.000208655 seconds
+convolution (memory): 		  = 0.00645691 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 14.
+
+convolution (sequential): 		  = 0.0731508 seconds
+convolution (kernel): 		  = 0.000208822 seconds
+convolution (memory): 		  = 0.00530565 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 15.
+
+convolution (sequential): 		  = 0.0678075 seconds
+convolution (kernel): 		  = 0.000216863 seconds
+convolution (memory): 		  = 0.00788484 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 16.
+
+convolution (sequential): 		  = 0.0728518 seconds
+convolution (kernel): 		  = 0.000229577 seconds
+convolution (memory): 		  = 0.00792568 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 17.
+
+convolution (sequential): 		  = 0.0761813 seconds
+convolution (kernel): 		  =  0.000216 seconds
+convolution (memory): 		  = 0.00802061 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 18.
+
+convolution (sequential): 		  = 0.0758561 seconds
+convolution (kernel): 		  = 0.000217873 seconds
+convolution (memory): 		  = 0.00807517 seconds
+TEST PASSED!
+
+RTX 2080 Ti, run 19.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 20.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 21.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 22.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 23.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 24.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 25.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 26.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 27.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 28.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 29.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 30.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 31.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 32.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 33.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 34.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 35.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 36.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 37.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 38.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 39.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 40.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 41.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 42.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 43.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 44.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 45.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 46.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 47.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 48.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 49.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 50.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 51.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 52.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 53.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 54.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 55.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 56.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 57.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 58.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 59.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 60.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 61.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 62.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 63.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 64.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 65.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 66.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 67.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 68.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 69.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 70.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 71.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 72.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 73.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 74.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 75.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 76.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 77.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 78.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 79.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 80.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 81.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 82.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 83.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 84.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 85.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 86.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 87.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 88.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 89.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory
+
+RTX 2080 Ti, run 90.
+
+/cm/local/apps/slurm/var/spool/job3541458/slurm_script: line 25: ./myconvolution: No such file or directory

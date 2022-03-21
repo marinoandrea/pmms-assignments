@@ -1,0 +1,79 @@
+rm -f *.o myconvolution
+nvcc -O3 -g --ptxas-options=-v -c convolution.cu -o convolution.o
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z24convolution_kernel_naivePfS_S_' for 'sm_30'
+ptxas info    : Function properties for _Z24convolution_kernel_naivePfS_S_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, 344 bytes cmem[0], 20 bytes cmem[2]
+g++ -O3 -m64 -Wall -c timer.cc -o timer.o
+nvcc convolution.o timer.o -o myconvolution
+
+TitanX Maxwell, run 1.
+
+convolution (sequential): 		  = 0.0500565 seconds
+convolution (kernel): 		  = 0.00238589 seconds
+convolution (memory): 		  = 0.0079492 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 2.
+
+convolution (sequential): 		  =  0.046141 seconds
+convolution (kernel): 		  = 0.00238332 seconds
+convolution (memory): 		  = 0.00785642 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 3.
+
+convolution (sequential): 		  = 0.0441498 seconds
+convolution (kernel): 		  = 0.00227616 seconds
+convolution (memory): 		  = 0.00750274 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 4.
+
+convolution (sequential): 		  = 0.0461917 seconds
+convolution (kernel): 		  = 0.00238532 seconds
+convolution (memory): 		  = 0.00792631 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 5.
+
+convolution (sequential): 		  = 0.0462196 seconds
+convolution (kernel): 		  = 0.00238317 seconds
+convolution (memory): 		  = 0.00788845 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 6.
+
+convolution (sequential): 		  = 0.0462386 seconds
+convolution (kernel): 		  = 0.0023824 seconds
+convolution (memory): 		  = 0.00790782 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 7.
+
+convolution (sequential): 		  = 0.0460941 seconds
+convolution (kernel): 		  = 0.00238316 seconds
+convolution (memory): 		  = 0.00790843 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 8.
+
+convolution (sequential): 		  = 0.0461902 seconds
+convolution (kernel): 		  = 0.0023839 seconds
+convolution (memory): 		  = 0.00792783 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 9.
+
+convolution (sequential): 		  = 0.0461514 seconds
+convolution (kernel): 		  = 0.00238712 seconds
+convolution (memory): 		  = 0.00790356 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 10.
+
+convolution (sequential): 		  = 0.0462033 seconds
+convolution (kernel): 		  = 0.00238563 seconds
+convolution (memory): 		  = 0.00788883 seconds
+TEST PASSED!

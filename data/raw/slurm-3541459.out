@@ -1,0 +1,381 @@
+rm -f *.o myconvolution
+nvcc -O3 -g --ptxas-options=-v -c convolution.cu -o convolution.o
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z24convolution_kernel_naivePfS_S_' for 'sm_30'
+ptxas info    : Function properties for _Z24convolution_kernel_naivePfS_S_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, 344 bytes cmem[0], 20 bytes cmem[2]
+g++ -O3 -m64 -Wall -c timer.cc -o timer.o
+nvcc convolution.o timer.o -o myconvolution
+
+TitanX Maxwell, run 1.
+
+convolution (sequential): 		  = 0.0759212 seconds
+convolution (kernel): 		  = 0.00235325 seconds
+convolution (memory): 		  = 0.00748942 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 2.
+
+convolution (sequential): 		  = 0.0446428 seconds
+convolution (kernel): 		  = 0.00230016 seconds
+convolution (memory): 		  = 0.00734316 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 3.
+
+convolution (sequential): 		  =  0.075864 seconds
+convolution (kernel): 		  = 0.00220905 seconds
+convolution (memory): 		  = 0.00815973 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 4.
+
+convolution (sequential): 		  = 0.0777945 seconds
+convolution (kernel): 		  = 0.00238328 seconds
+convolution (memory): 		  = 0.00762368 seconds
+TEST PASSED!
+
+TitanX Maxwell, run 5.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 6.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 7.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 8.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 9.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 10.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 11.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 12.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 13.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 14.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 15.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 16.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 17.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 18.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 19.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 20.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 21.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 22.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 23.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 24.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 25.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 26.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 27.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 28.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 29.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 30.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 31.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 32.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 33.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 34.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 35.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 36.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 37.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 38.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 39.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 40.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 41.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 42.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 43.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 44.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 45.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 46.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 47.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 48.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 49.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 50.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 51.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 52.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 53.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 54.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 55.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 56.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 57.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 58.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 59.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 60.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 61.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 62.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 63.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 64.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 65.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 66.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 67.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 68.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 69.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 70.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 71.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 72.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 73.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 74.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 75.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 76.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 77.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 78.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 79.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 80.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 81.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 82.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 83.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 84.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 85.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 86.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 87.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 88.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 89.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
+
+TitanX Maxwell, run 90.
+
+/cm/local/apps/slurm/var/spool/job3541459/slurm_script: line 25: ./myconvolution: No such file or directory
