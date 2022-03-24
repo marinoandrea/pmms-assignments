@@ -26,12 +26,13 @@ __global__ void k_copy_columns(double* m_heat, size_t n_cols, size_t n_rows)
 {
     size_t g_idx = blockIdx.x * blockDim.x + threadIdx.x;
  
-    if (g_idx >= n_rows) return;
-  
-    size_t row_idx = g_idx * n_cols;
+    if (g_idx < n_rows)
+    {
+        size_t row_idx = g_idx * n_cols;
 
-    m_heat[row_idx]              = m_heat[row_idx + n_cols - 2];
-    m_heat[row_idx + n_cols - 1] = m_heat[row_idx + 1];
+        m_heat[row_idx]              = m_heat[row_idx + n_cols - 2];
+        m_heat[row_idx + n_cols - 1] = m_heat[row_idx + 1];
+    }
 }
 
 __global__ void k_compute_temp(
