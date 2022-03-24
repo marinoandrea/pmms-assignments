@@ -73,9 +73,21 @@ static void checkCudaCall(cudaError_t result) {
 }
 
 
-__global__ void histogramKernel(unsigned char* image, long img_size, unsigned int* histogram, int hist_size) {
-// insert operation here
+__global__ void histogramKernel(unsigned char* image, long img_size, unsigned int* histogram, int hist_size) 
+{
+    unsigned int gid = blockIdx.x * blockDim.x + threadIdx.x;
 
+    if (gid < hist_size)
+    {
+        histogram[gid] = 0;
+    }
+
+    __syncthreads();
+ 
+    if (gid < img_size)
+    {
+        atomicAdd(&histogram[image[gid]], 1);
+    }
 }
 
 void histogramCuda(unsigned char* image, long img_size, unsigned int* histogram, int hist_size) {
@@ -106,7 +118,7 @@ void histogramCuda(unsigned char* image, long img_size, unsigned int* histogram,
 
     // execute kernel
     kernelTime1.start();
-    histogramKernel<<<img_size/threadBlockSize, threadBlockSize>>>(deviceImage, img_size, deviceHisto, hist_size);
+    histogramKernel<<<img_size/threadBlockSize + 1, threadBlockSize>>>(deviceImage, img_size, deviceHisto, hist_size);
     cudaDeviceSynchronize();
     kernelTime1.stop();
 
