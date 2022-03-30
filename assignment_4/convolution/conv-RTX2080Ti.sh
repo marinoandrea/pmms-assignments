@@ -18,9 +18,19 @@ module load cuda10.0/profiler/10.0.130
 make clean
 make
 
-# Run 10 times
-for i in {1..10}
+# Four 100x150 images...
+for image in {pat1_100x150.pgm, pat2_100x150.pgm, pat3_100x150.pgm, plasma_100x150.pgm}
 do
-   printf "\nRTX 2080 Ti, run %d.\n\n" $i
-   ./myconvolution
+   for i in {1..100}
+   do
+      printf "\nRTX 2080 Ti, file %s, run %d.\n\n" $image, $i
+      ./myconvolution -i ../../images/$image -h 100 -w 150
+   done
+done
+
+# And one 2000 x 2000 image.
+for i in {1..100}
+do
+   printf "\nRTX 2080 Ti, file test_2000x2000.pgm, run %d.\n\n" , $i
+   ./myconvolution -i ../../images/test_2000x2000.pgm -h 2000 -w 2000
 done
