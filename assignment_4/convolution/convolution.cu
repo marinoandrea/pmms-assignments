@@ -199,19 +199,17 @@ int main(int argc, char *argv[]) {
 
     const char *image_path = 0;
     image_path ="../../images/pat1_100x150.pgm";
-    int gen_image = 0;
+    int gen_image = 1;
 
     long int image_height = 1024;
     long int image_width = 1024;
 
     /* Read command-line options. */
-    while((c = getopt(argc, argv, "i:r:h:w")) != -1) {
+    while((c = getopt(argc, argv, "i:h:w")) != -1) {
         switch(c) {
             case 'i':
+                gen_image = 0;
                 image_path = optarg;
-            	break;
-            case 'r':
-            	gen_image = 1;
             	break;
             case 'h':
                 image_height = strtol(optarg, 0, 10);
