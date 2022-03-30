@@ -19,7 +19,7 @@ make clean
 make
 
 # Four 100x150 images...
-for image in {pat1_100x150.pgm, pat2_100x150.pgm, pat3_100x150.pgm, plasma_100x150.pgm}
+for image in pat1_100x150.pgm, pat2_100x150.pgm, pat3_100x150.pgm, plasma_100x150.pgm
 do
    for i in {1..100}
    do
