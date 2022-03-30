@@ -1,16 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <getopt.h>
 #include "timer.h"
 
-#define image_height 1024
-#define image_width 1024
 #define filter_height 5
 #define filter_width 5
 
 #define border_height ((filter_height/2)*2)
 #define border_width ((filter_width/2)*2)
-#define input_height (image_height + border_height)
-#define input_width (image_width + border_width)
 
 #define block_size_x 32
 #define block_size_y 16
@@ -19,7 +18,9 @@
 
 using namespace std;
 
-void convolutionSeq(float *output, float *input, float *filter) {
+void convolutionSeq(float *output, float *input, float *filter,
+                    long int image_height, long int image_width,
+                    long int input_height, long int input_width) {
     timer sequentialTime = timer("Sequential");
     
     sequentialTime.start();
@@ -45,8 +46,9 @@ void convolutionSeq(float *output, float *input, float *filter) {
 
 }
 
-
-__global__ void convolution_kernel_naive(float *output, float *input, float *filter) {
+__global__ void convolution_kernel_naive(float *output, float *input, float *filter,
+                                         long int image_height, long int image_width,
+                                         long int input_height, long int input_width) {
     // TODO: Determine x and y based on Block ID and Grid ID.
     size_t y = blockIdx.y * blockDim.y + threadIdx.y;
     size_t x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -61,7 +63,9 @@ __global__ void convolution_kernel_naive(float *output, float *input, float *fil
     output[y*image_width+x] /= 35;
 }
 
-void convolutionCUDA(float *output, float *input, float *filter) {
+void convolutionCUDA(float *output, float *input, float *filter,
+                    long int image_height, long int image_width,
+                    long int input_height, long int input_width) {
     float *d_input; float *d_output; float *d_filter;
     cudaError_t err;
     timer kernelTime = timer("kernelTime");
@@ -94,7 +98,9 @@ void convolutionCUDA(float *output, float *input, float *filter) {
 
     //measure the GPU function
     kernelTime.start();
-    convolution_kernel_naive<<<grid, threads>>>(d_output, d_input, d_filter);
+    convolution_kernel_naive<<<grid, threads>>>(d_output, d_input, d_filter,
+                                                image_height, image_width,
+                                                input_height, input_width);
     cudaDeviceSynchronize();
     kernelTime.stop();
  
@@ -147,39 +153,129 @@ int compare_arrays(float *a1, float *a2, int n) {
 
     return errors;
 }
-        
 
-int main() {
+void die(const char *msg){
+    if (errno != 0) 
+        perror(msg);
+    else
+        fprintf(stderr, "error: %s\n", msg);
+    exit(1);
+}
+
+static void readpgm_float(const char *fname,
+                          long int height, long int width, float *input) {
+    char format[3];
+    FILE *f;
+    unsigned imgw, imgh, maxv, v;
+    size_t i;
+
+    if (!(f = fopen(fname, "r"))) die("fopen");
+
+    fscanf(f, "%2s", format);
+    if (format[0] != 'P' || format[1] != '2') die("only ASCII PGM input is supported");
+
+    if (fscanf(f, "%u", &imgw) != 1 ||
+        fscanf(f, "%u", &imgh) != 1 ||
+        fscanf(f, "%u", &maxv) != 1) die("invalid input");
+
+    if (imgw != width || imgh != height) {
+        fprintf(stderr, "input data size (%ux%u) does not match provided image dimensions (%zux%zu)\n",
+                imgw, imgh, width, height);
+        die("invalid input");
+    }
+
+    for (i = 0; i < width * height; ++i)
+    {
+        if (fscanf(f, "%u", &v) != 1) die("invalid data");
+        input[i] = 0.0 + (float)v * 1.0 / maxv;
+    }
+
+    fclose(f);
+}
+
+int main(int argc, char *argv[]) {
+    int c;
     int i; 
     int errors=0;
+
+    const char *image_path = 0;
+    image_path = "../../images/pat1_100x150.pgm";
+    int gen_image = 1;
+
+    /* Default size for randomly generated input */
+    int image_height = 1024;
+    int image_width = 1024;
+
+    printf("before getopt\n");
+
+    /* Read command-line options. */
+    while((c = getopt(argc, argv, "i:h:w:")) != -1) {
+        switch(c) {
+            case 'i':
+                gen_image = 0;
+                image_path = optarg;
+            	break;
+            case 'h':
+                image_height = strtol(optarg, 0, 10);
+            	break;
+            case 'w':
+                image_width = strtol(optarg, 0, 10);
+				break;
+            case '?':
+                fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
+                return -1;
+            default:
+                return -1;
+        }
+    }
+
+    int input_height = (image_height + border_height);
+    int input_width  = (image_width  + border_width);
+
+    printf("before alloc\n");
 
     //allocate arrays and fill them
     float *input = (float *) malloc(input_height * input_width * sizeof(float));
     float *output1 = (float *) calloc(image_height * image_width, sizeof(float));
     float *output2 = (float *) calloc(image_height * image_width, sizeof(float));
     float *filter = (float *) malloc(filter_height * filter_width * sizeof(float));
+    
+    printf("after alloc\n");
 
-    for (i=0; i< input_height * input_width; i++) {
-        input[i] = (float) (i % SEED);
+    if (gen_image) {
+        for (i=0; i< input_height * input_width; i++) {
+            input[i] = (float) (i % SEED);
+        }
+    } else {
+        readpgm_float(image_path, image_height, image_width, input);
     }
 
-//THis is specific for a W==H smoothening filteri, where W and H are odd.
+    printf("after readpgm_float\n");
+
+    //This is specific for a W==H smoothing filter, where W and H are odd.
     for (i=0; i<filter_height * filter_width; i++) { 
       filter[i] = 1.0;
     }
 
     for (i=filter_width+1; i<(filter_height - 1) * filter_width; i++) {
-	if (i % filter_width > 0 && i % filter_width < filter_width-1) filter[i]+=1.0; 
+	    if (i % filter_width > 0 && i % filter_width < filter_width-1)
+            filter[i]+=1.0; 
     }
 
     filter[filter_width*filter_height/2]=3.0;
-//end initialization
+    //end initialization
+
+    printf("before seq\n");
    
     //measure the CPU function
-    convolutionSeq(output1, input, filter);
-    //measure the GPU function
-    convolutionCUDA(output2, input, filter);
+    convolutionSeq(output1, input, filter, image_height, image_width, input_height, input_width);
 
+    printf("before cuda\n");
+
+    //measure the GPU function
+    convolutionCUDA(output2, input, filter, image_height, image_width, input_height, input_width);
+
+    printf("after cuda\n");
 
     //check the result
     errors += compare_arrays(output1, output2, image_height*image_width);
@@ -188,7 +284,6 @@ int main() {
     } else {
         printf("TEST PASSED!\n");
     }
-
 
     free(filter);
     free(input);
