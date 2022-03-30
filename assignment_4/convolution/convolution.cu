@@ -187,7 +187,7 @@ static void readpgm_float(const char *fname,
     for (i = 0; i < width * height; ++i)
     {
         if (fscanf(f, "%u", &v) != 1) die("invalid data");
-        input[i] = 0.0 + (float)v * 1.0 / maxv;
+        input[i] = (float)v / (float)maxv;
     }
 
     fclose(f);
@@ -205,8 +205,6 @@ int main(int argc, char *argv[]) {
     /* Default size for randomly generated input */
     int image_height = 1024;
     int image_width = 1024;
-
-    printf("before getopt\n");
 
     /* Read command-line options. */
     while((c = getopt(argc, argv, "i:h:w:")) != -1) {
@@ -232,25 +230,26 @@ int main(int argc, char *argv[]) {
     int input_height = (image_height + border_height);
     int input_width  = (image_width  + border_width);
 
-    printf("before alloc\n");
-
     //allocate arrays and fill them
     float *input = (float *) malloc(input_height * input_width * sizeof(float));
+    float *input2 = (float *) malloc(input_height * input_width * sizeof(float));
     float *output1 = (float *) calloc(image_height * image_width, sizeof(float));
     float *output2 = (float *) calloc(image_height * image_width, sizeof(float));
     float *filter = (float *) malloc(filter_height * filter_width * sizeof(float));
     
-    printf("after alloc\n");
-
     if (gen_image) {
         for (i=0; i< input_height * input_width; i++) {
             input[i] = (float) (i % SEED);
         }
     } else {
-        readpgm_float(image_path, image_height, image_width, input);
-    }
+        readpgm_float(image_path, input_height, input_width, input);
 
-    printf("after readpgm_float\n");
+        for (i=0; i< input_height * input_width; i++) {
+            input2[i] = (float) (i % SEED);
+        }
+
+        compare_arrays(input, input2, input_height*input_width);
+    }
 
     //This is specific for a W==H smoothing filter, where W and H are odd.
     for (i=0; i<filter_height * filter_width; i++) { 
@@ -264,18 +263,12 @@ int main(int argc, char *argv[]) {
 
     filter[filter_width*filter_height/2]=3.0;
     //end initialization
-
-    printf("before seq\n");
    
     //measure the CPU function
     convolutionSeq(output1, input, filter, image_height, image_width, input_height, input_width);
 
-    printf("before cuda\n");
-
     //measure the GPU function
     convolutionCUDA(output2, input, filter, image_height, image_width, input_height, input_width);
-
-    printf("after cuda\n");
 
     //check the result
     errors += compare_arrays(output1, output2, image_height*image_width);
