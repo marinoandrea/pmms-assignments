@@ -49,7 +49,7 @@ void convolutionSeq(float *output, float *input, float *filter,
 __global__ void convolution_kernel_naive(float *output, float *input, float *filter,
                                          long int image_height, long int image_width,
                                          long int input_height, long int input_width) {
-    // TODO: Determine x and y based on Block ID and Grid ID.
+    // Determine x and y based on Block ID and Grid ID.
     size_t y = blockIdx.y * blockDim.y + threadIdx.y;
     size_t x = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -167,7 +167,7 @@ static void readpgm_float(const char *fname,
     char format[3];
     FILE *f;
     unsigned imgw, imgh, maxv, v;
-    size_t i;
+    size_t h, w;
 
     if (!(f = fopen(fname, "r"))) die("fopen");
 
@@ -184,10 +184,18 @@ static void readpgm_float(const char *fname,
         die("invalid input");
     }
 
-    for (i = 0; i < width * height; ++i)
-    {
-        if (fscanf(f, "%u", &v) != 1) die("invalid data");
-        input[i] = (float)v / (float)maxv;
+    for (h = 0; h < height + border_height; ++h) {
+        for (w = 0; w < width + border_width; ++w) {
+            if (h < border_height / 2 ||
+                h > height + border_height / 2 ||
+                w < border_width / 2 ||
+                w > width + border_width / 2) {
+                input[h * (width + border_width) + w] = 0.0;
+            } else {
+                if (fscanf(f, "%u", &v) != 1) die("invalid data");
+                input[h * (width + border_width) + w] = (float)v / (float)maxv;
+            }
+        }
     }
 
     fclose(f);
@@ -242,13 +250,7 @@ int main(int argc, char *argv[]) {
             input[i] = (float) (i % SEED);
         }
     } else {
-        readpgm_float(image_path, input_height, input_width, input);
-
-        for (i=0; i< input_height * input_width; i++) {
-            input2[i] = (float) (i % SEED);
-        }
-
-        compare_arrays(input, input2, input_height*input_width);
+        readpgm_float(image_path, image_height, image_width, input);
     }
 
     //This is specific for a W==H smoothing filter, where W and H are odd.
@@ -258,7 +260,7 @@ int main(int argc, char *argv[]) {
 
     for (i=filter_width+1; i<(filter_height - 1) * filter_width; i++) {
 	    if (i % filter_width > 0 && i % filter_width < filter_width-1)
-            filter[i]+=1.0; 
+            filter[i]+=1.0;
     }
 
     filter[filter_width*filter_height/2]=3.0;
