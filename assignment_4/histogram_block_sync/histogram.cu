@@ -94,10 +94,10 @@ __device__ void merge_output(unsigned int *histogram)
     
     int idx;
     unsigned int cnt;
-    for (int i = 0; i < BLOCK_SIZE; i++)
+    for (int i = 0; i < 64; i++)
     {
-        idx = (i + threadIdx.x) & (BLOCK_SIZE - 1);
-        cnt = s_histogram[threadIdx.x * BLOCK_SIZE + idx];
+        idx = (i + threadIdx.x) & 63;
+        cnt = s_histogram[threadIdx.x * 64 + idx];
 
         cnt02 += cnt & 0xff00ff;
         cnt >>= 8;
@@ -127,10 +127,19 @@ __global__ void histogramKernel(unsigned char* image, long img_size, unsigned in
     }
 
     __syncthreads();
+
+    unsigned int iterations = 0;
     
     for (int i = gid; i < img_size; i += blockDim.x * gridDim.x) 
     {
 	    increment_private_histo(image[i]);
+        // periodically merge the output in order to avoid overflow
+        if (++iterations >= 255)
+        {
+            iterations = 0;
+            __syncthreads();
+            merge_output(histogram);
+        }
     }
 
     __syncthreads();
