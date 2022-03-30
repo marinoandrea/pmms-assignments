@@ -9,7 +9,6 @@ extern "C"
 }
 
 #define BLOCK_SIZE 128
-#define BLOCK_SIZE_REPORT 128
 
 __device__ __constant__ double COEF_D = 0.1035533905932;
 __device__ __constant__ double COEF_S = 0.1464466094067;
@@ -82,7 +81,7 @@ __global__ void k_compute_report(
     double *out_g_mins,
     double *out_g_maxs)
 {
-    __shared__ double s_data[BLOCK_SIZE_REPORT * sizeof(double) * 4];
+    __shared__ double s_data[BLOCK_SIZE * sizeof(double) * 4];
 
     double *s_sums = s_data;
     double *s_difs = &s_data[BLOCK_SIZE];
@@ -242,7 +241,7 @@ void cuda_do_compute(const struct parameters *p, struct results *r)
 
             clock_gettime(CLOCK_MONOTONIC, &after);
 
-            k_compute_report<<<n_cells / BLOCK_SIZE_REPORT + 1, BLOCK_SIZE_REPORT>>>(
+            k_compute_report<<<n_blocks, BLOCK_SIZE>>>(
                 m_heat_prev_device, 
                 m_heat_next_device, 
                 n_cols, n_cols_actual, 
