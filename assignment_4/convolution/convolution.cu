@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <getopt.h>
@@ -178,7 +179,7 @@ static void readpgm_float(const char *fname,
         fscanf(f, "%u", &maxv) != 1) die("invalid input");
 
     if (imgw != width || imgh != height) {
-        fprintf(stderr, "input data size (%ux%u) does not match cylinder size (%zux%zu)\n",
+        fprintf(stderr, "input data size (%ux%u) does not match provided image dimensions (%zux%zu)\n",
                 imgw, imgh, width, height);
         die("invalid input");
     }
@@ -198,14 +199,17 @@ int main(int argc, char *argv[]) {
     int errors=0;
 
     const char *image_path = 0;
-    image_path ="../../images/pat1_100x150.pgm";
+    image_path = "../../images/pat1_100x150.pgm";
     int gen_image = 1;
 
-    long int image_height = 1024;
-    long int image_width = 1024;
+    /* Default size for randomly generated input */
+    int image_height = 1024;
+    int image_width = 1024;
+
+    printf("before getopt\n");
 
     /* Read command-line options. */
-    while((c = getopt(argc, argv, "i:h:w")) != -1) {
+    while((c = getopt(argc, argv, "i:h:w:")) != -1) {
         switch(c) {
             case 'i':
                 gen_image = 0;
@@ -225,14 +229,18 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    long int input_height = (image_height + border_height);
-    long int input_width  = (image_width  + border_width);
+    int input_height = (image_height + border_height);
+    int input_width  = (image_width  + border_width);
+
+    printf("before alloc\n");
 
     //allocate arrays and fill them
     float *input = (float *) malloc(input_height * input_width * sizeof(float));
     float *output1 = (float *) calloc(image_height * image_width, sizeof(float));
     float *output2 = (float *) calloc(image_height * image_width, sizeof(float));
     float *filter = (float *) malloc(filter_height * filter_width * sizeof(float));
+    
+    printf("after alloc\n");
 
     if (gen_image) {
         for (i=0; i< input_height * input_width; i++) {
@@ -241,6 +249,8 @@ int main(int argc, char *argv[]) {
     } else {
         readpgm_float(image_path, image_height, image_width, input);
     }
+
+    printf("after readpgm_float\n");
 
     //This is specific for a W==H smoothing filter, where W and H are odd.
     for (i=0; i<filter_height * filter_width; i++) { 
@@ -254,13 +264,18 @@ int main(int argc, char *argv[]) {
 
     filter[filter_width*filter_height/2]=3.0;
     //end initialization
+
+    printf("before seq\n");
    
     //measure the CPU function
     convolutionSeq(output1, input, filter, image_height, image_width, input_height, input_width);
 
+    printf("before cuda\n");
+
     //measure the GPU function
     convolutionCUDA(output2, input, filter, image_height, image_width, input_height, input_width);
 
+    printf("after cuda\n");
 
     //check the result
     errors += compare_arrays(output1, output2, image_height*image_width);
